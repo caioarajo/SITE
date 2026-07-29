@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import DashboardCharts from "@/components/admin/DashboardCharts";
 import { formatDateTime } from "@/lib/utils";
+import type { LeadRow } from "@/lib/types";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ export default async function AdminDashboard() {
     supabase.from("services").select("id", { count: "exact", head: true }),
   ]);
 
-  const leads = leadsRes.data ?? [];
+  const leads = (leadsRes.data as LeadRow[] | null) ?? [];
   const novoCount = leads.filter((l) => l.status === "novo").length;
 
   return (

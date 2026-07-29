@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "#portfolio", label: "Portfólio" },
   { href: "#depoimentos", label: "Depoimentos" },
   { href: "#contato", label: "Contato" },
+  { href: "/admin", label: "Área Administrativa" },
 ];
 
 export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: string; logoNavySrc: string }) {

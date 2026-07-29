@@ -83,11 +83,18 @@ visualmente como uma credencial à parte.
 
 ## O que falta / próximos passos possíveis
 
-- [ ] Gerar os tipos TypeScript reais do Supabase (`npx supabase gen types typescript`),
-      substituindo o `src/lib/types.ts` escrito manualmente
-- [ ] Testar o build (`npm run build`) — este projeto foi escrito sem acesso a `npm install`
-      no ambiente onde foi gerado, então nunca foi de fato compilado. Rodar
-      `npm install && npm run build` localmente antes do primeiro deploy é essencial.
+- [x] Migration `0001_init.sql` aplicada no projeto Supabase real (via MCP) — as 6
+      tabelas, RLS e dados de seed já existem no banco remoto.
+- [x] Tipos TypeScript reais gerados a partir do schema (`mcp__supabase__generate_typescript_types`)
+      em `src/lib/database.types.ts`. `src/lib/types.ts` deriva os aliases nomeados
+      (`ServiceRow`, `LeadRow` etc.) desse arquivo — para regenerar após uma mudança de
+      schema, rode a mesma ferramenta de novo e substitua o conteúdo de `database.types.ts`.
+      `EventStatus`/`MediaType` continuam como unions manuais (o Postgres não expõe
+      `check constraints` em colunas `text` como enum, então o codegen tipa essas colunas
+      como `string` genérico); por isso alguns pontos de leitura fazem um cast explícito
+      para o tipo estreito (`as LeadRow[]`, `as PortfolioItemRow[]`) — o runtime já garante
+      os valores via constraint no banco.
+- [x] Build testado (`npm install && npm run build`) — compila e tipa limpo.
 - [ ] E-mail de notificação quando um lead novo chega (ex: via Resend)
 - [ ] Múltiplos usuários administrativos com permissões diferentes
 - [ ] Página de álbum individual por casamento (hoje o portfólio é uma galeria única,

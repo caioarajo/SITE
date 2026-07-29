@@ -39,7 +39,9 @@ export default function TestimonialsAdminPage() {
     if (form.id) {
       await supabase.from("testimonials").update(form).eq("id", form.id);
     } else {
-      await supabase.from("testimonials").insert({ ...form, display_order: items.length });
+      await supabase
+        .from("testimonials")
+        .insert({ ...form, couple_names: form.couple_names!, quote: form.quote!, display_order: items.length });
     }
     setForm(null);
     load();

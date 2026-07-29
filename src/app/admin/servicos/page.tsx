@@ -41,7 +41,7 @@ export default function ServicesAdminPage() {
     if (form.id) {
       await supabase.from("services").update(payload).eq("id", form.id);
     } else {
-      await supabase.from("services").insert({ ...payload, display_order: items.length });
+      await supabase.from("services").insert({ ...payload, name: payload.name!, display_order: items.length });
     }
     setForm(null);
     load();

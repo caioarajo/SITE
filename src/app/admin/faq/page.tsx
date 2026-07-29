@@ -31,7 +31,9 @@ export default function FaqAdminPage() {
     if (form.id) {
       await supabase.from("faqs").update(form).eq("id", form.id);
     } else {
-      await supabase.from("faqs").insert({ ...form, display_order: items.length });
+      await supabase
+        .from("faqs")
+        .insert({ ...form, question: form.question!, answer: form.answer!, display_order: items.length });
     }
     setForm(null);
     load();

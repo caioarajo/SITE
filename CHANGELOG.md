@@ -4,6 +4,25 @@ Todas as mudanças relevantes do projeto ficam registradas aqui, da mais recente
 mais antiga. Ao pedir uma alteração numa conversa futura, vale conferir este arquivo
 primeiro para saber o estado atual.
 
+## [1.0.1] — Banco de dados provisionado e build validado
+
+**Adicionado:**
+- Migration `0001_init.sql` aplicada no projeto Supabase real via MCP: as 6 tabelas,
+  RLS completo, bucket de storage `portfolio` e dados de seed agora existem no banco
+  remoto (antes só existiam como arquivo local, nunca aplicados)
+- Tipos TypeScript gerados a partir do schema real (`src/lib/database.types.ts`),
+  substituindo a versão escrita manualmente. `src/lib/types.ts` passou a derivar os
+  aliases (`ServiceRow`, `LeadRow` etc.) desse arquivo gerado
+
+**Corrigido:**
+- Primeiro `npm run build` real do projeto (nunca havia sido compilado antes).
+  Os tipos gerados são mais estritos que os manuais — passaram a exigir os campos
+  obrigatórios no insert e não inferem os `check constraints` de texto como union
+  literal. Ajustados os pontos de admin (depoimentos, serviços, FAQ) que faziam
+  `insert({ ...form })` a partir de um `Partial<Row>`, e os pontos que liam
+  `leads.status`/`portfolio_items.media_type` do Supabase, com cast explícito para o
+  tipo estreito — o runtime já garante esses valores via constraint no banco
+
 ## [1.0.0] — Versão inicial da aplicação Next.js
 
 Transformação completa do site estático (HTML/CSS/JS) numa aplicação Next.js 14 +

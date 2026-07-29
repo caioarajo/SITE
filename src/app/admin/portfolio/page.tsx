@@ -17,7 +17,7 @@ export default function PortfolioAdminPage() {
   async function load() {
     setLoading(true);
     const { data } = await supabase.from("portfolio_items").select("*").order("display_order", { ascending: true });
-    setItems(data ?? []);
+    setItems((data as PortfolioItemRow[] | null) ?? []);
     setLoading(false);
   }
 

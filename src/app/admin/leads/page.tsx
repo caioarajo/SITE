@@ -14,7 +14,7 @@ export default function LeadsPage() {
   async function load() {
     setLoading(true);
     const { data } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
-    setLeads(data ?? []);
+    setLeads((data as LeadRow[] | null) ?? []);
     setLoading(false);
   }
 

@@ -35,7 +35,7 @@ export async function getPortfolioItems(): Promise<PortfolioItemRow[]> {
     console.error("[getPortfolioItems]", error.message);
     return [];
   }
-  return data ?? [];
+  return (data as PortfolioItemRow[] | null) ?? [];
 }
 
 export async function getTestimonials(): Promise<TestimonialRow[]> {
