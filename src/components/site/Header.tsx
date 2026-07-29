@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { href: "#servicos", label: "Serviços" },
   { href: "#portfolio", label: "Portfólio" },
   { href: "#depoimentos", label: "Depoimentos" },
-  { href: "#contato", label: "Contato" },
 ];
 
 export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: string; logoNavySrc: string }) {
@@ -54,8 +53,14 @@ export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: st
               {link.label}
             </a>
           ))}
+          {/* No mobile (menu-drawer), os botões abaixo ficam ocultos — estas
+              versões em texto cobrem esse caso. No desktop elas somem via
+              CSS, já que os botões ao lado já cumprem o mesmo papel. */}
+          <a href="#contato" className="nav-link nav-cta-duplicate" onClick={() => setMenuOpen(false)}>
+            Contato
+          </a>
           {session !== "unknown" && (
-            <a href={authHref} className="nav-link" onClick={() => setMenuOpen(false)}>
+            <a href={authHref} className="nav-link nav-cta-duplicate" onClick={() => setMenuOpen(false)}>
               {authLabel}
             </a>
           )}
