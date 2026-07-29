@@ -49,7 +49,7 @@ export default function Footer({
       </div>
       <div className="bottom">
         Manaus, AM · © {new Date().getFullYear()} LP Assessoria e Cerimonial. Todos os direitos
-        reservados. · <a href="/admin/login">Área administrativa</a>
+        reservados.
       </div>
     </footer>
   );

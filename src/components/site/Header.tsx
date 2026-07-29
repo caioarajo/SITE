@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 const NAV_LINKS = [
   { href: "#sobre", label: "Sobre" },
@@ -9,12 +10,14 @@ const NAV_LINKS = [
   { href: "#portfolio", label: "Portfólio" },
   { href: "#depoimentos", label: "Depoimentos" },
   { href: "#contato", label: "Contato" },
-  { href: "/admin", label: "Área Administrativa" },
 ];
 
 export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: string; logoNavySrc: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // "unknown" enquanto a sessão ainda não foi checada no navegador — evita
+  // piscar "Entrar" e depois trocar para "Painel" assim que a página carrega.
+  const [session, setSession] = useState<"unknown" | "out" | "in">("unknown");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -22,6 +25,20 @@ export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: st
     document.addEventListener("scroll", onScroll, { passive: true });
     return () => document.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setSession(user ? "in" : "out"));
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, authSession) => {
+      setSession(authSession?.user ? "in" : "out");
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const authHref = session === "in" ? "/admin" : "/admin/login";
+  const authLabel = session === "in" ? "Painel" : "Entrar";
 
   return (
     <header id="site-header" className={cn(scrolled && "scrolled")}>
@@ -37,12 +54,22 @@ export default function Header({ logoCreamSrc, logoNavySrc }: { logoCreamSrc: st
               {link.label}
             </a>
           ))}
+          {session !== "unknown" && (
+            <a href={authHref} className="nav-link" onClick={() => setMenuOpen(false)}>
+              {authLabel}
+            </a>
+          )}
         </nav>
 
         <div className="cta-wrap">
           <a href="#contato" className="btn btn-ghost">
             Contato
           </a>
+          {session !== "unknown" && (
+            <a href={authHref} className="btn btn-ghost">
+              {authLabel}
+            </a>
+          )}
           <button
             className="menu-toggle"
             aria-label="Abrir menu"
