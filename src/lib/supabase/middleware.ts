@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import type { Database } from "@/lib/types";
 
 /**
  * Atualiza (refresh) a sessão do Supabase a cada requisição e devolve
@@ -11,7 +12,7 @@ export async function updateSession(request: NextRequest) {
     request: { headers: request.headers },
   });
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -37,5 +38,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { response, user };
+  if (!user) {
+    return { response, user, profile: null };
+  }
+
+  // RLS de `profiles` só deixa o usuário ler a própria linha — dá pra
+  // confiar nesse resultado mesmo vindo do client com a anon key.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, is_active, must_change_password")
+    .eq("id", user.id)
+    .single();
+
+  return { response, user, profile };
 }

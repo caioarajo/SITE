@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import IconSprite from "@/components/site/IconSprite";
+import type { UserRole } from "@/lib/types";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -15,10 +15,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <>{children}</>;
   }
 
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+
   return (
     <div className="admin-shell">
       <IconSprite />
-      <AdminSidebar userEmail={user.email ?? ""} />
+      <AdminSidebar userEmail={user.email ?? ""} role={(profile?.role as UserRole) ?? "usuario_avancado"} />
       <main className="admin-main">{children}</main>
     </div>
   );

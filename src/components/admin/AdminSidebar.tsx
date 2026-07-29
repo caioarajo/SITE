@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { UserRole } from "@/lib/types";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard", icon: "grid" },
@@ -13,6 +14,8 @@ const LINKS = [
   { href: "/admin/faq", label: "FAQ", icon: "help" },
   { href: "/admin/settings", label: "Configurações", icon: "gear" },
 ];
+
+const ADMIN_ONLY_LINKS = [{ href: "/admin/usuarios", label: "Usuários", icon: "users" }];
 
 const ICONS: Record<string, React.ReactNode> = {
   grid: (
@@ -61,11 +64,20 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.3 2.6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.3-2.6a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5z" />
     </svg>
   ),
+  users: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round" />
+      <path d="M16 8.5a3 3 0 1 1 0 6" strokeLinecap="round" />
+      <path d="M21.5 20c0-2.8-2-5.1-4.6-5.8" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
-export default function AdminSidebar({ userEmail }: { userEmail: string }) {
+export default function AdminSidebar({ userEmail, role }: { userEmail: string; role: UserRole }) {
   const pathname = usePathname();
   const router = useRouter();
+  const links = role === "admin" ? [...LINKS, ...ADMIN_ONLY_LINKS] : LINKS;
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -84,7 +96,7 @@ export default function AdminSidebar({ userEmail }: { userEmail: string }) {
       </div>
 
       <nav>
-        {LINKS.map((link) => {
+        {links.map((link) => {
           const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
           return (
             <Link key={link.href} href={link.href} className={active ? "active" : ""}>

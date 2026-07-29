@@ -4,6 +4,34 @@ Todas as mudanças relevantes do projeto ficam registradas aqui, da mais recente
 mais antiga. Ao pedir uma alteração numa conversa futura, vale conferir este arquivo
 primeiro para saber o estado atual.
 
+## [1.1.0] — Gestão de usuários e controle de acesso por papel (RBAC)
+
+**Adicionado:**
+- Migration `0002_user_management.sql`: tabela `public.profiles` (nome, papel,
+  ativo/inativo, troca de senha obrigatória) e função `current_user_role()` usada nas
+  policies de RLS de todas as tabelas operacionais — antes qualquer usuário
+  autenticado tinha acesso total; agora `admin` e `usuario_avancado` têm escrita nas
+  tabelas de conteúdo, e `site_settings` é exclusivo de `admin`
+- Tela `/admin/usuarios` (só visível para `admin`): CRUD de usuários com busca, filtro
+  por papel/status e paginação; redefinição de senha (gera senha temporária exibida
+  uma única vez); ativar/desativar conta
+- Rotas server-side (`/api/admin/users/*`, com a Service Role Key) para todas as ações
+  acima — o navegador nunca tem acesso direto a essas operações
+- Tela de troca de senha obrigatória (`/admin/change-password`) para contas recém-
+  criadas ou com senha redefinida pelo admin
+- Papel "Cliente" reservado no schema e no formulário de criação, mas sem área própria
+  ainda (cai em `/admin/sem-acesso`) — este app não tem hoje nenhum dado por cliente
+- Componente de Toast (`src/components/admin/Toast.tsx`) para feedback de
+  sucesso/erro nas ações da tela de usuários
+
+**Corrigido:**
+- `middleware.ts` estava na raiz do projeto em vez de `src/middleware.ts` — no local
+  errado, o Next.js nunca o reconhecia, e `/admin/*` nunca teve proteção real em
+  nenhum deploy. Corrigido durante esta sessão, antes da feature de RBAC
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` na Vercel (produção) tinha um caractere BOM
+  colado no início do valor, quebrando todo `fetch` autenticado feito pelo navegador
+  (login incluído). Variável recriada sem o BOM
+
 ## [1.0.1] — Banco de dados provisionado e build validado
 
 **Adicionado:**

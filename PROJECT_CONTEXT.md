@@ -56,10 +56,17 @@ Ver `supabase/migrations/0001_init.sql` para o schema completo e comentado. Resu
 - `site_settings` — chave/valor simples (`phone`, `whatsapp`, `email`, `instagram`).
 
 **Row Level Security**: público (anon) só lê linhas com `is_published = true` (exceto
-`leads`, que o público só consegue INSERIR, nunca ler). Qualquer usuário autenticado tem
-acesso total de escrita — não há hierarquia de permissões (assumindo que só a Lia terá
-login). Se no futuro houver mais de um usuário admin com permissões diferentes, isso
-precisa ser revisto.
+`leads`, que o público só consegue INSERIR, nunca ler). Escrita nas tabelas de conteúdo
+exige o papel `admin` ou `usuario_avancado` (ver `profiles` abaixo); `site_settings` é
+exclusivo de `admin`.
+
+- `profiles` — um usuário do painel (nome, `role`: `admin` | `usuario_avancado` |
+  `cliente`, `is_active`, `must_change_password`). Ver `supabase/migrations/0002_user_management.sql`.
+  Gerenciado inteiramente por `/admin/usuarios` (só visível para `admin`) e pelas rotas
+  `src/app/api/admin/users/*`, que usam a Service Role Key — o navegador nunca cria,
+  edita ou desativa usuário diretamente. O papel `cliente` está reservado no schema/
+  formulário mas ainda não tem área própria (cai em `/admin/sem-acesso`): este app não
+  tem hoje nenhum dado "por cliente" (leads são só formulário de contato, não contas).
 
 ## Identidade visual (não mexer sem pedido explícito)
 
@@ -95,8 +102,10 @@ visualmente como uma credencial à parte.
       para o tipo estreito (`as LeadRow[]`, `as PortfolioItemRow[]`) — o runtime já garante
       os valores via constraint no banco.
 - [x] Build testado (`npm install && npm run build`) — compila e tipa limpo.
+- [x] Múltiplos usuários administrativos com níveis de acesso (`admin` /
+      `usuario_avancado` / `cliente` reservado) — `/admin/usuarios`, ver seção RLS acima.
 - [ ] E-mail de notificação quando um lead novo chega (ex: via Resend)
-- [ ] Múltiplos usuários administrativos com permissões diferentes
+- [ ] Área própria para o papel "Cliente" (hoje só existe o enum/gating, sem tela real)
 - [ ] Página de álbum individual por casamento (hoje o portfólio é uma galeria única,
       sem agrupamento por evento)
 
@@ -112,3 +121,13 @@ visualmente como uma credencial à parte.
   indexável, sem esperar JavaScript no navegador para mostrar conteúdo.
 - `revalidate = 60` na home: mudanças feitas no admin aparecem no site público em até
   1 minuto, sem precisar de novo deploy.
+- **`middleware.ts` tem que ficar em `src/middleware.ts`**, nunca na raiz do projeto —
+  como o app usa a pasta `src/`, o Next.js só reconhece o middleware lá. Na raiz, ele é
+  silenciosamente ignorado (sem erro, sem aviso) e `/admin/*` fica sem proteção nenhuma;
+  isso já aconteceu uma vez neste projeto.
+- Ações que precisam de privilégio total sobre usuários (criar, redefinir senha,
+  ativar/desativar) só existem como rotas server-side em `src/app/api/admin/users/*`,
+  usando `createServiceRoleClient()` (`src/lib/supabase/server.ts`) — nunca no cliente,
+  e cada rota confere com `requireAdmin()`/`requireActiveUser()`
+  (`src/lib/supabase/admin-guard.ts`) que quem está chamando tem permissão antes de
+  fazer qualquer coisa.
