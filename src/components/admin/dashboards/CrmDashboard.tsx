@@ -5,6 +5,7 @@ import type { EChartsOption } from "echarts";
 import EChart from "@/components/admin/EChart";
 import type { OpportunityRow, OpportunityStage, OpportunitySource } from "@/lib/types";
 import { NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN, CATEGORY_PALETTE } from "@/lib/chartColors";
+import { formatCurrency } from "@/lib/utils";
 
 const STAGE_LABELS: Record<OpportunityStage, string> = {
   novo: "Novo",
@@ -100,7 +101,7 @@ export default function CrmDashboard({ opportunities }: { opportunities: Opportu
 
     return {
       grid: { left: 90, right: 24, top: 10, bottom: 10 },
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (v: number) => formatCurrency(v) },
       xAxis: { type: "value", splitLine: { lineStyle: { color: "#efe7da" } }, axisLabel: { color: "#8f7c66" } },
       yAxis: {
         type: "category",
@@ -112,7 +113,7 @@ export default function CrmDashboard({ opportunities }: { opportunities: Opportu
           type: "bar",
           data: data.map((v, i) => ({ value: v, itemStyle: { color: CATEGORY_PALETTE[i % CATEGORY_PALETTE.length] } })),
           barWidth: 18,
-          label: { show: true, position: "right", color: "#5b4f42", formatter: (p: { value: number }) => `R$ ${p.value.toFixed(0)}` },
+          label: { show: true, position: "right", color: "#5b4f42", formatter: (p: { value: number }) => formatCurrency(p.value) },
         },
       ],
     };
@@ -127,7 +128,7 @@ export default function CrmDashboard({ opportunities }: { opportunities: Opportu
         </div>
         <div className="admin-stat-card">
           <div className="label">Valor em negociação</div>
-          <div className="value">R$ {openValue.toFixed(0)}</div>
+          <div className="value">{formatCurrency(openValue)}</div>
         </div>
         <div className="admin-stat-card">
           <div className="label">Taxa de conversão</div>

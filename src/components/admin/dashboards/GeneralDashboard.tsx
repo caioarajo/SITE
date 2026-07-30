@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import DashboardCharts from "@/components/admin/DashboardCharts";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatCurrency } from "@/lib/utils";
 import type { LeadRow, ClientRow, EventRow, OpportunityRow, PayableRow, ReceivableRow } from "@/lib/types";
 
 export default function GeneralDashboard({
@@ -50,12 +50,12 @@ export default function GeneralDashboard({
         </div>
         <div className="admin-stat-card">
           <div className="label">Valor em negociação (CRM)</div>
-          <div className="value">R$ {openOpportunityValue.toFixed(0)}</div>
+          <div className="value">{formatCurrency(openOpportunityValue)}</div>
         </div>
         <div className="admin-stat-card">
           <div className="label">Saldo previsto do mês</div>
           <div className="value" style={{ color: projectedBalanceThisMonth >= 0 ? undefined : "#b3311c" }}>
-            R$ {projectedBalanceThisMonth.toFixed(0)}
+            {formatCurrency(projectedBalanceThisMonth)}
           </div>
         </div>
       </div>

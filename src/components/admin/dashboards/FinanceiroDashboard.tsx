@@ -6,7 +6,7 @@ import { ptBR } from "date-fns/locale";
 import type { EChartsOption } from "echarts";
 import EChart from "@/components/admin/EChart";
 import type { PayableRow, ReceivableRow } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import { GREEN, RED, NAVY } from "@/lib/chartColors";
 
 function isOverduePayable(item: PayableRow, today: string) {
@@ -50,7 +50,7 @@ export default function FinanceiroDashboard({
 
     return {
       grid: { left: 50, right: 16, top: 30, bottom: 30 },
-      tooltip: { trigger: "axis" },
+      tooltip: { trigger: "axis", valueFormatter: (v: number) => formatCurrency(v) },
       legend: { top: 0, textStyle: { color: "#5b4f42", fontSize: 12 } },
       xAxis: {
         type: "category",
@@ -103,7 +103,7 @@ export default function FinanceiroDashboard({
 
     return {
       grid: { left: 60, right: 16, top: 30, bottom: 30 },
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (v: number) => formatCurrency(v) },
       legend: { top: 0, textStyle: { color: "#5b4f42", fontSize: 12 } },
       xAxis: {
         type: "category",
@@ -123,22 +123,22 @@ export default function FinanceiroDashboard({
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
           <div className="label">A receber (em aberto)</div>
-          <div className="value">R$ {openReceivable.toFixed(0)}</div>
+          <div className="value">{formatCurrency(openReceivable)}</div>
         </div>
         <div className="admin-stat-card">
           <div className="label">A pagar (em aberto)</div>
-          <div className="value">R$ {openPayable.toFixed(0)}</div>
+          <div className="value">{formatCurrency(openPayable)}</div>
         </div>
         <div className="admin-stat-card">
           <div className="label">Saldo previsto</div>
           <div className="value" style={{ color: projectedBalance >= 0 ? undefined : "#b3311c" }}>
-            R$ {projectedBalance.toFixed(0)}
+            {formatCurrency(projectedBalance)}
           </div>
         </div>
         <div className="admin-stat-card">
           <div className="label">Total vencido</div>
           <div className="value" style={{ color: overdueTotal > 0 ? "#b3311c" : undefined }}>
-            R$ {overdueTotal.toFixed(0)}
+            {formatCurrency(overdueTotal)}
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ export default function FinanceiroDashboard({
                     <td>{r.description}</td>
                     <td>A receber</td>
                     <td>{formatDate(r.due_date)}</td>
-                    <td>R$ {r.amount.toFixed(2)}</td>
+                    <td>{formatCurrency(r.amount)}</td>
                   </tr>
                 ))}
                 {overduePayable.map((p) => (
@@ -183,7 +183,7 @@ export default function FinanceiroDashboard({
                     <td>{p.description}</td>
                     <td>A pagar</td>
                     <td>{formatDate(p.due_date)}</td>
-                    <td>R$ {p.amount.toFixed(2)}</td>
+                    <td>{formatCurrency(p.amount)}</td>
                   </tr>
                 ))}
               </tbody>

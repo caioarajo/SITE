@@ -33,19 +33,30 @@ function getSeatPosition(shape: string, seatIndex: number, seatCount: number) {
   return { x: cx, y: cy };
 }
 
+/**
+ * "edit" (padrão): mesas arrastáveis, cadeiras douradas/neutras, clique
+ * abre o seletor de convidado — usado na tela principal do mapa.
+ * "overview": somente leitura, sem drag, cadeiras e mesas em vermelho
+ * (lotada/ocupada) ou verde (com vaga/disponível) — usado no modal de
+ * visão geral do salão.
+ */
 export default function TableMap({
   tables,
   seats,
   guestsById,
   onDragTableEnd,
   onSeatClick,
+  variant = "edit",
 }: {
   tables: EventTableRow[];
   seats: EventSeatRow[];
   guestsById: Map<string, GuestRow>;
-  onDragTableEnd: (tableId: string, x: number, y: number) => void;
-  onSeatClick: (seat: EventSeatRow) => void;
+  onDragTableEnd?: (tableId: string, x: number, y: number) => void;
+  onSeatClick?: (seat: EventSeatRow) => void;
+  variant?: "edit" | "overview";
 }) {
+  const isOverview = variant === "overview";
+
   return (
     <div className="table-map-canvas">
       <div className="table-map-inner">
@@ -54,33 +65,52 @@ export default function TableMap({
           const tableSeats = seats
             .filter((s) => s.event_table_id === table.id)
             .sort((a, b) => a.seat_number - b.seat_number);
+          const occupiedCount = tableSeats.filter((s) => s.guest_id).length;
+          const tableFull = tableSeats.length > 0 && occupiedCount === tableSeats.length;
 
           return (
             <motion.div
               key={`${table.id}-${table.pos_x}-${table.pos_y}`}
               className={`event-table shape-${table.shape}`}
-              drag
+              drag={!isOverview}
               dragMomentum={false}
               style={{ left: table.pos_x, top: table.pos_y, width: size.w, height: size.h }}
-              onDragEnd={(_, info) => {
-                onDragTableEnd(table.id, table.pos_x + info.offset.x, table.pos_y + info.offset.y);
-              }}
+              onDragEnd={
+                isOverview
+                  ? undefined
+                  : (_, info) => onDragTableEnd?.(table.id, table.pos_x + info.offset.x, table.pos_y + info.offset.y)
+              }
             >
-              <div className="table-shape" style={{ width: size.w, height: size.h }}>
+              <div
+                className={`table-shape ${isOverview ? (tableFull ? "overview-full" : "overview-space") : ""}`}
+                style={{ width: size.w, height: size.h }}
+              >
                 Mesa {table.label}
+                {isOverview && (
+                  <small style={{ display: "block", fontWeight: 400, fontSize: 10.5 }}>
+                    {occupiedCount}/{tableSeats.length}
+                  </small>
+                )}
               </div>
               {tableSeats.map((seat, i) => {
                 const pos = getSeatPosition(table.shape, i, tableSeats.length);
                 const guest = seat.guest_id ? guestsById.get(seat.guest_id) : null;
+                const seatClass = isOverview
+                  ? guest
+                    ? "overview-occupied"
+                    : "overview-available"
+                  : guest
+                    ? "occupied"
+                    : "";
                 return (
                   <div
                     key={seat.id}
-                    className={`event-seat ${guest ? "occupied" : ""}`}
-                    style={{ left: pos.x, top: pos.y }}
+                    className={`event-seat ${seatClass}`}
+                    style={{ left: pos.x, top: pos.y, cursor: isOverview ? "default" : "pointer" }}
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSeatClick(seat);
+                      if (!isOverview) onSeatClick?.(seat);
                     }}
                     title={guest ? guest.name : `Cadeira ${seat.seat_code} — vazia`}
                   >

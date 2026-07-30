@@ -1314,6 +1314,14 @@
 .event-seat.occupied{ background:var(--gold); border-color:var(--gold); color:var(--cream); }
 .event-seat .seat-code{ position:absolute; top:-16px; font-size:8px; color:var(--taupe-deep); font-weight:500; }
 
+/* Modo overview (mapa completo em modal): vermelho = ocupada/lotada,
+   verde = disponível — tanto na cadeira quanto no corpo da mesa. */
+.event-seat.overview-occupied{ background:#c0392b; border-color:#c0392b; color:#fff; cursor:default; }
+.event-seat.overview-available{ background:#2e8b57; border-color:#2e8b57; color:#fff; cursor:default; }
+.event-seat.overview-occupied:hover, .event-seat.overview-available:hover{ transform:none; box-shadow:none; }
+.table-shape.overview-full{ background:#c0392b; border-color:#8f2a1f; color:#fff; }
+.table-shape.overview-space{ background:#2e8b57; border-color:#1f6b40; color:#fff; }
+
 .standing-panel{
   display:flex; flex-wrap:wrap; gap:8px;
 }
@@ -1321,6 +1329,10 @@
   display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px;
   background:var(--cream-alt); font-size:12.5px; color:var(--espresso);
 }
+
+/* Modal grande (mapa completo) — a .modal padrão tem max-width 560px,
+   pequeno demais para o salão inteiro. */
+.modal.modal-lg{ max-width:min(96vw, 1400px); }
 
 @media (max-width: 900px){
   .table-map-canvas{ height:480px; }

@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import type { StaffRow } from "@/lib/types";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
+import { formatCurrency } from "@/lib/utils";
+import { maskCPF, maskPhone } from "@/lib/masks";
 
 const emptyForm: Partial<StaffRow> = {
   name: "",
@@ -107,7 +109,7 @@ function ColaboradoresPageContent() {
                   <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
                   <td>{item.role_title || "—"}</td>
                   <td>{[item.email, item.phone].filter(Boolean).join(" · ") || "—"}</td>
-                  <td>{item.day_rate != null ? `R$ ${item.day_rate.toFixed(2)}` : "—"}</td>
+                  <td>{item.day_rate != null ? formatCurrency(item.day_rate) : "—"}</td>
                   <td>
                     <span className={`status-badge ${item.is_active ? "status-confirmado" : "status-cancelado"}`}>
                       {item.is_active ? "Ativo" : "Inativo"}
@@ -156,7 +158,7 @@ function ColaboradoresPageContent() {
                 <input
                   className="field-input"
                   value={form.document ?? ""}
-                  onChange={(e) => setForm({ ...form, document: e.target.value })}
+                  onChange={(e) => setForm({ ...form, document: maskCPF(e.target.value) })}
                 />
               </div>
             </div>
@@ -175,7 +177,7 @@ function ColaboradoresPageContent() {
                 <input
                   className="field-input"
                   value={form.phone ?? ""}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 />
               </div>
             </div>

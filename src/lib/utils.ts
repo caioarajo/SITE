@@ -21,6 +21,12 @@ export function cn(...classes: Array<string | false | null | undefined>): string
   return classes.filter(Boolean).join(" ");
 }
 
+/** Formata um valor monetário no padrão brasileiro: "R$ 8.000,00". */
+export function formatCurrency(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
 export const statusLabels: Record<string, string> = {
   novo: "Novo",
   em_contato: "Em contato",

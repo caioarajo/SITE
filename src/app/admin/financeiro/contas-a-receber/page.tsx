@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import type { ReceivableRow, ReceivableStatus, ClientRow, EventRow } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
 
@@ -168,7 +168,7 @@ function ContasAReceberPageContent() {
                     <td>{clientName(item.client_id)}</td>
                     <td>{eventTitle(item.event_id)}</td>
                     <td>{formatDate(item.due_date)}</td>
-                    <td>R$ {item.amount.toFixed(2)}</td>
+                    <td>{formatCurrency(item.amount)}</td>
                     <td>
                       <span className={`status-badge status-${status.key}`}>{status.label}</span>
                     </td>

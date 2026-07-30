@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ClientRow, ClientType } from "@/lib/types";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
+import { maskCPF, maskCNPJ, maskCEP, maskPhone } from "@/lib/masks";
 
 const emptyForm: Partial<ClientRow> = {
   name: "",
@@ -13,6 +14,7 @@ const emptyForm: Partial<ClientRow> = {
   document: "",
   email: "",
   phone: "",
+  zip_code: "",
   address: "",
   notes: "",
   is_active: true,
@@ -151,11 +153,17 @@ function ClientesPageContent() {
                 </select>
               </div>
               <div className="field-group">
-                <label className="field-label">CPF/CNPJ</label>
+                <label className="field-label">{form.client_type === "pessoa_juridica" ? "CNPJ" : "CPF"}</label>
                 <input
                   className="field-input"
                   value={form.document ?? ""}
-                  onChange={(e) => setForm({ ...form, document: e.target.value })}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      document:
+                        form.client_type === "pessoa_juridica" ? maskCNPJ(e.target.value) : maskCPF(e.target.value),
+                    })
+                  }
                 />
               </div>
             </div>
@@ -174,17 +182,27 @@ function ClientesPageContent() {
                 <input
                   className="field-input"
                   value={form.phone ?? ""}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 />
               </div>
             </div>
-            <div className="field-group">
-              <label className="field-label">Endereço</label>
-              <input
-                className="field-input"
-                value={form.address ?? ""}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-              />
+            <div className="field-row">
+              <div className="field-group">
+                <label className="field-label">CEP</label>
+                <input
+                  className="field-input"
+                  value={form.zip_code ?? ""}
+                  onChange={(e) => setForm({ ...form, zip_code: maskCEP(e.target.value) })}
+                />
+              </div>
+              <div className="field-group">
+                <label className="field-label">Endereço</label>
+                <input
+                  className="field-input"
+                  value={form.address ?? ""}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                />
+              </div>
             </div>
             <div className="field-group">
               <label className="field-label">Notas</label>

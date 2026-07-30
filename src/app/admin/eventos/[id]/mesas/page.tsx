@@ -28,6 +28,7 @@ function MapaMesasPageContent() {
   const [savingTable, setSavingTable] = useState(false);
 
   const [seatModal, setSeatModal] = useState<EventSeatRow | null>(null);
+  const [overviewOpen, setOverviewOpen] = useState(false);
   const [seatGuestChoice, setSeatGuestChoice] = useState("");
 
   async function load() {
@@ -224,6 +225,13 @@ function MapaMesasPageContent() {
           <Link href="/admin/eventos" className="admin-btn admin-btn-line">
             Voltar aos eventos
           </Link>
+          <button
+            className="admin-btn admin-btn-line"
+            onClick={() => setOverviewOpen(true)}
+            disabled={tables.length === 0}
+          >
+            Ver Mapa Completo
+          </button>
           <button className="admin-btn admin-btn-gold" onClick={openCreateTable}>
             + Nova mesa
           </button>
@@ -463,6 +471,33 @@ function MapaMesasPageContent() {
             )}
           </div>
         )}
+      </Modal>
+
+      {/* Mapa completo — visão geral somente leitura, vermelho = ocupada/lotada, verde = disponível */}
+      <Modal
+        open={overviewOpen}
+        onClose={() => setOverviewOpen(false)}
+        title="Mapa Completo do Salão"
+        className="modal-lg"
+      >
+        <div className="table-map-toolbar">
+          <div className="table-map-legend">
+            <span>
+              <span className="dot" style={{ background: "#c0392b" }} />
+              Ocupada / lotada ({occupiedSeats})
+            </span>
+            <span>
+              <span className="dot" style={{ background: "#2e8b57" }} />
+              Disponível ({freeSeats})
+            </span>
+          </div>
+        </div>
+        <TableMap tables={tables} seats={seats} guestsById={guestsById} variant="overview" />
+        <div className="modal-actions">
+          <button type="button" className="admin-btn admin-btn-line" onClick={() => setOverviewOpen(false)}>
+            Fechar
+          </button>
+        </div>
       </Modal>
     </>
   );

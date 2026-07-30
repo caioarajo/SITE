@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { SupplierRow } from "@/lib/types";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
+import { maskDocument, maskPhone } from "@/lib/masks";
 
 const emptyForm: Partial<SupplierRow> = {
   name: "",
@@ -153,7 +154,7 @@ function FornecedoresPageContent() {
                 <input
                   className="field-input"
                   value={form.document ?? ""}
-                  onChange={(e) => setForm({ ...form, document: e.target.value })}
+                  onChange={(e) => setForm({ ...form, document: maskDocument(e.target.value) })}
                 />
               </div>
             </div>
@@ -180,7 +181,7 @@ function FornecedoresPageContent() {
                 <input
                   className="field-input"
                   value={form.phone ?? ""}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 />
               </div>
             </div>

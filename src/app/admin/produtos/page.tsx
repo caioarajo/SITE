@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ProductRow } from "@/lib/types";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
+import { formatCurrency } from "@/lib/utils";
 
 const emptyForm: Partial<ProductRow> = {
   name: "",
@@ -102,7 +103,7 @@ function ProdutosPageContent() {
                 >
                   <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
                   <td>{item.category || "—"}</td>
-                  <td>R$ {item.unit_price.toFixed(2)}</td>
+                  <td>{formatCurrency(item.unit_price)}</td>
                   <td>
                     <span className={`status-badge ${item.is_active ? "status-confirmado" : "status-cancelado"}`}>
                       {item.is_active ? "Ativo" : "Inativo"}

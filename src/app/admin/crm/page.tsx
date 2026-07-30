@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import type { OpportunityRow, OpportunitySource, OpportunityStage } from "@/lib/types";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
+import { formatCurrency } from "@/lib/utils";
+import { maskPhone } from "@/lib/masks";
 
 const emptyForm: Partial<OpportunityRow> = {
   name: "",
@@ -173,7 +175,7 @@ function CrmPageContent() {
                       <div className="meta">
                         <span>{SOURCE_LABELS[item.source]}</span>
                         {item.estimated_value != null && (
-                          <span className="value">R$ {item.estimated_value.toFixed(2)}</span>
+                          <span className="value">{formatCurrency(item.estimated_value)}</span>
                         )}
                       </div>
                       <div className="actions" onClick={(e) => e.stopPropagation()}>
@@ -235,7 +237,7 @@ function CrmPageContent() {
                 <input
                   className="field-input"
                   value={form.phone ?? ""}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 />
               </div>
             </div>

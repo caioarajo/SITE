@@ -8,11 +8,13 @@ export default function Modal({
   onClose,
   title,
   children,
+  className,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  className?: string;
 }) {
   return (
     <AnimatePresence>
@@ -25,7 +27,7 @@ export default function Modal({
           onClick={onClose}
         >
           <motion.div
-            className="modal"
+            className={`modal${className ? ` ${className}` : ""}`}
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { maskPhone } from "@/lib/masks";
 
 export default function SettingsPage() {
   const [phone, setPhone] = useState("");
@@ -54,7 +55,7 @@ export default function SettingsPage() {
         <form onSubmit={handleSubmit}>
           <div className="field-group">
             <label className="field-label">Telefone (exibido no site)</label>
-            <input className="field-input" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input className="field-input" value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} />
           </div>
           <div className="field-group">
             <label className="field-label">Número de WhatsApp (formato internacional, só números)</label>
