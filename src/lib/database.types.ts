@@ -194,6 +194,39 @@ export type Database = {
         }
         Relationships: []
       }
+      event_guest_lists: {
+        Row: {
+          created_at: string
+          event_id: string
+          guest_list_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          guest_list_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          guest_list_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_guest_lists_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_guest_lists_guest_list_id_fkey"
+            columns: ["guest_list_id"]
+            isOneToOne: false
+            referencedRelation: "guest_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           budget_total: number | null
@@ -273,6 +306,80 @@ export type Database = {
           question?: string
         }
         Relationships: []
+      }
+      guest_lists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      guests: {
+        Row: {
+          category: string | null
+          companions: number
+          created_at: string
+          email: string | null
+          guest_list_id: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          rsvp_status: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          companions?: number
+          created_at?: string
+          email?: string | null
+          guest_list_id: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          rsvp_status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          companions?: number
+          created_at?: string
+          email?: string | null
+          guest_list_id?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          rsvp_status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_guest_list_id_fkey"
+            columns: ["guest_list_id"]
+            isOneToOne: false
+            referencedRelation: "guest_lists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {

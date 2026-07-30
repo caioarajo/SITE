@@ -33,6 +33,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/colaboradores", label: "Colaboradores", icon: "badge" },
       { href: "/admin/fornecedores", label: "Fornecedores", icon: "truck" },
       { href: "/admin/produtos", label: "Produtos", icon: "box" },
+      { href: "/admin/listas-convidados", label: "Listas de Convidados", icon: "list" },
+      { href: "/admin/convidados", label: "Convidados", icon: "user-check" },
     ],
   },
   {
@@ -163,6 +165,21 @@ const ICONS: Record<string, React.ReactNode> = {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="12" cy="12" r="9" />
       <path d="M12 8v8M8.5 12.5L12 16l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  list: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M8 6h13M8 12h13M8 18h13" strokeLinecap="round" />
+      <circle cx="3.5" cy="6" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="3.5" cy="12" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="3.5" cy="18" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  "user-check": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round" />
+      <path d="M16 11l2 2 3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
 };

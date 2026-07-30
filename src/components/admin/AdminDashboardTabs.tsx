@@ -16,6 +16,7 @@ import type {
   OpportunityRow,
   PayableRow,
   ReceivableRow,
+  GuestRow,
 } from "@/lib/types";
 
 const TABS = [
@@ -35,6 +36,7 @@ export default function AdminDashboardTabs({
   opportunities,
   payable,
   receivable,
+  guests,
 }: {
   leads: LeadRow[];
   clients: ClientRow[];
@@ -45,6 +47,7 @@ export default function AdminDashboardTabs({
   opportunities: OpportunityRow[];
   payable: PayableRow[];
   receivable: ReceivableRow[];
+  guests: GuestRow[];
 }) {
   const [active, setActive] = useState("geral");
 
@@ -62,7 +65,7 @@ export default function AdminDashboardTabs({
       )}
       {active === "crm" && <CrmDashboard opportunities={opportunities} />}
       {active === "cadastros" && (
-        <CadastrosDashboard events={events} staff={staff} suppliers={suppliers} products={products} />
+        <CadastrosDashboard events={events} staff={staff} suppliers={suppliers} products={products} guests={guests} />
       )}
       {active === "financeiro" && <FinanceiroDashboard payable={payable} receivable={receivable} />}
     </AdminTabs>

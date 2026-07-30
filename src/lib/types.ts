@@ -18,6 +18,7 @@ export type OpportunitySource = "site_form" | "whatsapp" | "manual" | "indicacao
 export type OpportunityStage = "novo" | "qualificando" | "proposta" | "negociacao" | "ganho" | "perdido";
 export type PayableStatus = "pendente" | "pago" | "cancelado";
 export type ReceivableStatus = "pendente" | "recebido" | "cancelado";
+export type RsvpStatus = "pendente" | "confirmado" | "recusado";
 
 type Tables = Database["public"]["Tables"];
 
@@ -68,6 +69,14 @@ export type PayableRow = Omit<Tables["accounts_payable"]["Row"], "status"> & {
 export type ReceivableRow = Omit<Tables["accounts_receivable"]["Row"], "status"> & {
   status: ReceivableStatus;
 };
+
+export type GuestListRow = Tables["guest_lists"]["Row"];
+
+export type GuestRow = Omit<Tables["guests"]["Row"], "rsvp_status"> & {
+  rsvp_status: RsvpStatus;
+};
+
+export type EventGuestListRow = Tables["event_guest_lists"]["Row"];
 
 // Combinação de public.profiles + auth.users (email, último acesso), montada
 // pela rota /api/admin/users — não existe como uma única tabela no banco.

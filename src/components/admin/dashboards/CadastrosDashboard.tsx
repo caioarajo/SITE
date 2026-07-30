@@ -5,9 +5,21 @@ import { format, subMonths, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { EChartsOption } from "echarts";
 import EChart from "@/components/admin/EChart";
-import type { EventRow, EventRecordStatus, StaffRow, SupplierRow, ProductRow } from "@/lib/types";
+import type { EventRow, EventRecordStatus, StaffRow, SupplierRow, ProductRow, GuestRow, RsvpStatus } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import { NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN } from "@/lib/chartColors";
+import { NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN, RED } from "@/lib/chartColors";
+
+const RSVP_LABELS: Record<RsvpStatus, string> = {
+  pendente: "Pendente",
+  confirmado: "Confirmado",
+  recusado: "Recusado",
+};
+
+const RSVP_COLORS: Record<RsvpStatus, string> = {
+  pendente: GOLD,
+  confirmado: GREEN,
+  recusado: RED,
+};
 
 const STATUS_LABELS: Record<EventRecordStatus, string> = {
   planejamento: "Planejamento",
@@ -30,11 +42,13 @@ export default function CadastrosDashboard({
   staff,
   suppliers,
   products,
+  guests,
 }: {
   events: EventRow[];
   staff: StaffRow[];
   suppliers: SupplierRow[];
   products: ProductRow[];
+  guests: GuestRow[];
 }) {
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = events
@@ -88,6 +102,32 @@ export default function CadastrosDashboard({
     };
   }, [events]);
 
+  const rsvpOption = useMemo(() => {
+    const counts: Record<string, number> = { pendente: 0, confirmado: 0, recusado: 0 };
+    guests.forEach((g) => {
+      counts[g.rsvp_status] = (counts[g.rsvp_status] ?? 0) + 1;
+    });
+
+    return {
+      tooltip: { trigger: "item" },
+      legend: { bottom: 0, textStyle: { color: "#5b4f42", fontSize: 12 } },
+      series: [
+        {
+          type: "pie",
+          radius: ["45%", "72%"],
+          center: ["50%", "42%"],
+          itemStyle: { borderColor: "#faf6ef", borderWidth: 2 },
+          label: { color: "#352b22", fontSize: 12 },
+          data: (Object.entries(RSVP_LABELS) as [RsvpStatus, string][]).map(([status, label]) => ({
+            value: counts[status],
+            name: label,
+            itemStyle: { color: RSVP_COLORS[status] },
+          })),
+        },
+      ],
+    };
+  }, [guests]);
+
   return (
     <>
       <div className="admin-stats-grid">
@@ -107,6 +147,10 @@ export default function CadastrosDashboard({
           <div className="label">Produtos ativos</div>
           <div className="value">{products.filter((p) => p.is_active).length}</div>
         </div>
+        <div className="admin-stat-card">
+          <div className="label">Convidados cadastrados</div>
+          <div className="value">{guests.length}</div>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20, marginBottom: 24 }}>
@@ -117,6 +161,10 @@ export default function CadastrosDashboard({
         <div className="chart-card">
           <h2>Eventos por status</h2>
           <EChart option={statusOption as EChartsOption} />
+        </div>
+        <div className="chart-card" style={{ gridColumn: "1 / -1" }}>
+          <h2>Confirmação de convidados (RSVP)</h2>
+          <EChart option={rsvpOption as EChartsOption} height={220} />
         </div>
       </div>
 
