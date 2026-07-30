@@ -58,7 +58,7 @@ function FloatingSpark({
   );
 }
 
-export default function Hero({ heroPhotoSrc }: { heroPhotoSrc: string }) {
+export default function Hero({ heroPhotoSrc, whatsappNumber }: { heroPhotoSrc: string; whatsappNumber: string }) {
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const mouseX = useSpring(rawX, { stiffness: 120, damping: 20 });
@@ -152,7 +152,7 @@ export default function Hero({ heroPhotoSrc }: { heroPhotoSrc: string }) {
           <motion.div variants={item} className="actions">
             <a
               className="btn btn-primary"
-              href="https://wa.me/5592992662890"
+              href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={captureWhatsappClick}

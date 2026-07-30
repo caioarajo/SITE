@@ -4,12 +4,11 @@ import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Reveal from "./Reveal";
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5592992662890";
-
 interface Settings {
   phone: string;
   email: string;
   instagram: string;
+  whatsapp: string;
 }
 
 export default function ContactSection({
@@ -50,7 +49,7 @@ export default function ContactSection({
       }
       if (message) text += ` Detalhes: ${message}`;
 
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      const url = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
       window.open(url, "_blank", "noopener");
     } catch (err) {
       console.error(err);
@@ -83,7 +82,7 @@ export default function ContactSection({
           </p>
 
           <div className="contact-links">
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer">
               <span className="ic">
                 <svg>
                   <use href="#ic-phone" />

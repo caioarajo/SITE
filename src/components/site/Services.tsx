@@ -6,9 +6,7 @@ import type { ServiceRow } from "@/lib/types";
 import Reveal, { RevealGroup, RevealItem } from "./Reveal";
 import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
 
-const WHATSAPP_URL = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5592992662890"}`;
-
-function ServiceCard({ service }: { service: ServiceRow }) {
+function ServiceCard({ service, whatsappNumber }: { service: ServiceRow; whatsappNumber: string }) {
   const [expanded, setExpanded] = useState(false);
   const visible = service.features.slice(0, 4);
   const more = service.features.slice(4);
@@ -55,7 +53,7 @@ function ServiceCard({ service }: { service: ServiceRow }) {
 
       <a
         className={`btn ${service.is_featured ? "btn-primary" : "btn-line"}`}
-        href={WHATSAPP_URL}
+        href={`https://wa.me/${whatsappNumber}`}
         target="_blank"
         rel="noopener noreferrer"
         onClick={captureWhatsappClick}
@@ -66,7 +64,7 @@ function ServiceCard({ service }: { service: ServiceRow }) {
   );
 }
 
-export default function Services({ services }: { services: ServiceRow[] }) {
+export default function Services({ services, whatsappNumber }: { services: ServiceRow[]; whatsappNumber: string }) {
   return (
     <section className="services" id="servicos">
       <div className="wrap">
@@ -92,7 +90,7 @@ export default function Services({ services }: { services: ServiceRow[] }) {
 
         <RevealGroup className="cards">
           {services.map((s) => (
-            <ServiceCard key={s.id} service={s} />
+            <ServiceCard key={s.id} service={s} whatsappNumber={whatsappNumber} />
           ))}
         </RevealGroup>
 

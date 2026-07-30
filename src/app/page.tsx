@@ -32,10 +32,10 @@ export default async function HomePage() {
       <Header logoCreamSrc="/logo-full-cream.png" logoNavySrc="/logo-full-navy.png" />
 
       <main id="top">
-        <Hero heroPhotoSrc="/images/hero-couple.jpg" />
+        <Hero heroPhotoSrc="/images/hero-couple.jpg" whatsappNumber={settings.whatsapp} />
         <About liaPortraitSrc="/images/lia-portrait.jpg" />
         <Process />
-        <Services services={services} />
+        <Services services={services} whatsappNumber={settings.whatsapp} />
         <Portfolio items={portfolioItems} />
         <Testimonials testimonials={testimonials} />
         <Faq faqs={faqs} />
@@ -45,6 +45,7 @@ export default async function HomePage() {
             phone: settings.phone,
             email: settings.email,
             instagram: settings.instagram,
+            whatsapp: settings.whatsapp,
           }}
         />
       </main>
