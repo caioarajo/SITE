@@ -227,6 +227,105 @@ export type Database = {
           },
         ]
       }
+      event_seats: {
+        Row: {
+          created_at: string
+          event_id: string
+          event_table_id: string
+          guest_id: string | null
+          id: string
+          seat_code: string
+          seat_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          event_table_id: string
+          guest_id?: string | null
+          id?: string
+          seat_code: string
+          seat_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          event_table_id?: string
+          guest_id?: string | null
+          id?: string
+          seat_code?: string
+          seat_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_seats_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_seats_event_table_id_fkey"
+            columns: ["event_table_id"]
+            isOneToOne: false
+            referencedRelation: "event_tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_seats_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_tables: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          label: string
+          pos_x: number
+          pos_y: number
+          seat_count: number
+          shape: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          label: string
+          pos_x?: number
+          pos_y?: number
+          seat_count?: number
+          shape?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          label?: string
+          pos_x?: number
+          pos_y?: number
+          seat_count?: number
+          shape?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tables_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           budget_total: number | null

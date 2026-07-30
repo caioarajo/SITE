@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { EventRow, EventCategory, EventRecordStatus, ClientRow } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -142,6 +143,9 @@ function EventosPageContent() {
                     <span className={`status-badge status-${item.status}`}>{STATUS_LABELS[item.status]}</span>
                   </td>
                   <td className="row-actions">
+                    <Link href={`/admin/eventos/${item.id}/mesas`} className="admin-btn admin-btn-line admin-btn-sm">
+                      Mapa de Mesas
+                    </Link>
                     <button className="admin-btn admin-btn-line admin-btn-sm" onClick={() => setForm(item)}>
                       Editar
                     </button>

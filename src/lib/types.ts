@@ -19,6 +19,7 @@ export type OpportunityStage = "novo" | "qualificando" | "proposta" | "negociaca
 export type PayableStatus = "pendente" | "pago" | "cancelado";
 export type ReceivableStatus = "pendente" | "recebido" | "cancelado";
 export type RsvpStatus = "pendente" | "confirmado" | "recusado";
+export type TableShape = "round" | "rectangle";
 
 type Tables = Database["public"]["Tables"];
 
@@ -77,6 +78,12 @@ export type GuestRow = Omit<Tables["guests"]["Row"], "rsvp_status"> & {
 };
 
 export type EventGuestListRow = Tables["event_guest_lists"]["Row"];
+
+export type EventTableRow = Omit<Tables["event_tables"]["Row"], "shape"> & {
+  shape: TableShape;
+};
+
+export type EventSeatRow = Tables["event_seats"]["Row"];
 
 // Combinação de public.profiles + auth.users (email, último acesso), montada
 // pela rota /api/admin/users — não existe como uma única tabela no banco.
