@@ -182,6 +182,12 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M16 11l2 2 3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  home: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 11l8-7 8 7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 export default function AdminSidebar({ userEmail, role }: { userEmail: string; role: UserRole }) {
@@ -221,6 +227,11 @@ export default function AdminSidebar({ userEmail, role }: { userEmail: string; r
           </div>
         ))}
       </nav>
+
+      <Link href="/" target="_blank" rel="noopener noreferrer" className="back-to-site">
+        {ICONS.home}
+        <span>Voltar ao Site</span>
+      </Link>
 
       <div style={{ fontSize: 11, color: "rgba(250,246,239,0.4)", padding: "0 12px 8px" }}>{userEmail}</div>
       <button className="signout" onClick={handleSignOut}>
