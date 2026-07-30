@@ -6,11 +6,7 @@ import { ptBR } from "date-fns/locale";
 import type { EChartsOption } from "echarts";
 import EChart from "./EChart";
 import type { LeadRow } from "@/lib/types";
-
-const NAVY = "#182c52";
-const GOLD = "#ab7f3f";
-const ROSE = "#c98f8a";
-const TAUPE = "#b6a48d";
+import { NAVY, GOLD, ROSE, TAUPE, GREEN } from "@/lib/chartColors";
 
 export default function DashboardCharts({ leads }: { leads: LeadRow[] }) {
   // --- Leads nos últimos 30 dias (gráfico de linha) ---
@@ -71,7 +67,7 @@ export default function DashboardCharts({ leads }: { leads: LeadRow[] }) {
           data: [
             { value: counts.novo, name: "Novo", itemStyle: { color: NAVY } },
             { value: counts.em_contato, name: "Em contato", itemStyle: { color: GOLD } },
-            { value: counts.fechado, name: "Fechado", itemStyle: { color: "#3a8a5c" } },
+            { value: counts.fechado, name: "Fechado", itemStyle: { color: GREEN } },
           ],
         },
       ],
@@ -86,7 +82,7 @@ export default function DashboardCharts({ leads }: { leads: LeadRow[] }) {
       counts[type] = (counts[type] ?? 0) + 1;
     });
     const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    const colors = [NAVY, GOLD, ROSE, TAUPE, "#8f7c66", "#3a8a5c"];
+    const colors = [NAVY, GOLD, ROSE, TAUPE, "#8f7c66", GREEN];
 
     return {
       grid: { left: 90, right: 24, top: 10, bottom: 10 },

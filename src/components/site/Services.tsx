@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ServiceRow } from "@/lib/types";
 import Reveal, { RevealGroup, RevealItem } from "./Reveal";
+import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
 
 const WHATSAPP_URL = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5592992662890"}`;
 
@@ -57,6 +58,7 @@ function ServiceCard({ service }: { service: ServiceRow }) {
         href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={captureWhatsappClick}
       >
         Quero esse pacote
       </a>

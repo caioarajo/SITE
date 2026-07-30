@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform, type Variants } from "framer-motion";
 import type { MouseEvent } from "react";
+import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
 
 const container: Variants = {
   hidden: {},
@@ -149,7 +150,13 @@ export default function Hero({ heroPhotoSrc }: { heroPhotoSrc: string }) {
           </motion.div>
 
           <motion.div variants={item} className="actions">
-            <a className="btn btn-primary" href="https://wa.me/5592992662890" target="_blank" rel="noopener noreferrer">
+            <a
+              className="btn btn-primary"
+              href="https://wa.me/5592992662890"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={captureWhatsappClick}
+            >
               Fale comigo no WhatsApp
             </a>
             <a className="btn btn-ghost" href="#portfolio">

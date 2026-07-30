@@ -11,6 +11,14 @@ export type EventStatus = "novo" | "em_contato" | "fechado";
 export type MediaType = "image" | "video";
 export type UserRole = "admin" | "usuario_avancado" | "cliente";
 
+export type ClientType = "pessoa_fisica" | "pessoa_juridica";
+export type EventCategory = "casamento" | "debutante" | "corporativo" | "aniversario" | "outro";
+export type EventRecordStatus = "planejamento" | "confirmado" | "em_andamento" | "concluido" | "cancelado";
+export type OpportunitySource = "site_form" | "whatsapp" | "manual" | "indicacao" | "outro";
+export type OpportunityStage = "novo" | "qualificando" | "proposta" | "negociacao" | "ganho" | "perdido";
+export type PayableStatus = "pendente" | "pago" | "cancelado";
+export type ReceivableStatus = "pendente" | "recebido" | "cancelado";
+
 type Tables = Database["public"]["Tables"];
 
 export type ServiceRow = Tables["services"]["Row"];
@@ -31,6 +39,34 @@ export type SiteSettingRow = Tables["site_settings"]["Row"];
 
 export type ProfileRow = Omit<Tables["profiles"]["Row"], "role"> & {
   role: UserRole;
+};
+
+export type ClientRow = Omit<Tables["clients"]["Row"], "client_type"> & {
+  client_type: ClientType;
+};
+
+export type EventRow = Omit<Tables["events"]["Row"], "event_type" | "status"> & {
+  event_type: EventCategory;
+  status: EventRecordStatus;
+};
+
+export type StaffRow = Tables["staff"]["Row"];
+
+export type SupplierRow = Tables["suppliers"]["Row"];
+
+export type ProductRow = Tables["products"]["Row"];
+
+export type OpportunityRow = Omit<Tables["opportunities"]["Row"], "source" | "stage"> & {
+  source: OpportunitySource;
+  stage: OpportunityStage;
+};
+
+export type PayableRow = Omit<Tables["accounts_payable"]["Row"], "status"> & {
+  status: PayableStatus;
+};
+
+export type ReceivableRow = Omit<Tables["accounts_receivable"]["Row"], "status"> & {
+  status: ReceivableStatus;
 };
 
 // Combinação de public.profiles + auth.users (email, último acesso), montada

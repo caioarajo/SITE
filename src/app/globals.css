@@ -1045,14 +1045,20 @@
   display:flex; flex-direction:column;
   padding:26px 18px;
   position:sticky; top:0; height:100vh;
+  overflow-y:auto;
 }
 .admin-sidebar .brand{ display:flex; align-items:center; gap:10px; padding:0 8px 26px; }
 .admin-sidebar .brand img{ height:34px; width:auto; }
-.admin-sidebar nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
+.admin-sidebar nav{ display:flex; flex-direction:column; gap:1px; flex:1; }
+.admin-sidebar .nav-group-label{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;
+  color:rgba(250,246,239,0.35); padding:16px 12px 6px;
+}
+.admin-sidebar .nav-group-label:first-child{ padding-top:2px; }
 .admin-sidebar nav a{
   display:flex; align-items:center; gap:11px;
-  padding:11px 12px; border-radius:5px;
-  font-size:13.5px; color:rgba(250,246,239,0.72);
+  padding:9px 12px; border-radius:5px;
+  font-size:13px; color:rgba(250,246,239,0.72);
   transition: background .2s, color .2s;
 }
 .admin-sidebar nav a svg{ width:16px; height:16px; flex:none; }
@@ -1112,6 +1118,55 @@
 .status-novo{ background:#e5edff; color:#2a4dab; }
 .status-em_contato{ background:#fff2d9; color:#93650b; }
 .status-fechado{ background:#e1f3e6; color:#276b41; }
+.status-pago, .status-recebido{ background:#e1f3e6; color:#276b41; }
+.status-pendente{ background:#fff2d9; color:#93650b; }
+.status-atrasado{ background:#f7e3e0; color:#a13a2a; }
+.status-cancelado{ background:#efe7da; color:#5b4f42; }
+.status-planejamento{ background:#efe7da; color:#5b4f42; }
+.status-confirmado{ background:#e5edff; color:#2a4dab; }
+.status-em_andamento{ background:#fff2d9; color:#93650b; }
+.status-concluido{ background:#e1f3e6; color:#276b41; }
+
+/* Abas do admin (dashboard em abas, etc.) */
+.admin-tabs{
+  display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:24px; flex-wrap:wrap;
+}
+.admin-tab{
+  position:relative; background:none; border:none; cursor:pointer; padding:12px 18px;
+  font-size:13.5px; font-weight:500; color:var(--taupe-deep); transition:color .2s;
+}
+.admin-tab:hover{ color:var(--espresso); }
+.admin-tab[aria-selected="true"]{ color:var(--navy); }
+.admin-tab-indicator{
+  position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--gold);
+}
+.admin-tab-panel{ width:100%; }
+
+/* Kanban do CRM */
+.kanban-board{
+  display:grid; grid-auto-flow:column; grid-auto-columns:minmax(240px, 1fr);
+  gap:16px; overflow-x:auto; padding-bottom:8px;
+}
+.kanban-column{
+  background:var(--cream-alt); border-radius:8px; padding:14px; min-height:200px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.kanban-column h3{
+  font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--taupe-deep);
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;
+}
+.kanban-column h3 .count{
+  background:var(--cream); border-radius:999px; padding:2px 8px; font-size:11px; color:var(--espresso);
+}
+.kanban-card{
+  background:var(--cream); border-radius:8px; padding:12px 14px; box-shadow:0 10px 25px -20px rgba(20,15,8,0.5);
+  font-size:13px; color:var(--espresso); cursor:pointer;
+}
+.kanban-card:hover{ box-shadow:0 14px 30px -18px rgba(20,15,8,0.6); }
+.kanban-card .name{ font-weight:600; margin-bottom:4px; }
+.kanban-card .meta{ font-size:11.5px; color:var(--taupe-deep); display:flex; justify-content:space-between; gap:8px; }
+.kanban-card .value{ color:var(--gold); font-weight:600; }
+.kanban-card .actions{ display:flex; gap:6px; margin-top:8px; }
 
 .empty-state{
   text-align:center; padding:50px 20px; color:var(--taupe-deep); font-size:14px;

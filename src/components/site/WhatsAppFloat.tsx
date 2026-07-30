@@ -1,3 +1,7 @@
+"use client";
+
+import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
+
 export default function WhatsAppFloat({ number }: { number: string }) {
   return (
     <a
@@ -6,6 +10,7 @@ export default function WhatsAppFloat({ number }: { number: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"
+      onClick={captureWhatsappClick}
     >
       <svg>
         <use href="#ic-wa" />

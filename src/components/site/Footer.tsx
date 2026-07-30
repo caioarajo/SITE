@@ -1,3 +1,7 @@
+"use client";
+
+import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
+
 interface Settings {
   whatsapp: string;
   email: string;
@@ -35,7 +39,13 @@ export default function Footer({
               <use href="#ic-insta" />
             </svg>
           </a>
-          <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <a
+            href={`https://wa.me/${settings.whatsapp}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            onClick={captureWhatsappClick}
+          >
             <svg>
               <use href="#ic-wa" />
             </svg>

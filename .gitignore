@@ -29,3 +29,6 @@ next-env.d.ts
 
 # supabase cli
 supabase/.temp
+
+# claude code (config local, não versionar)
+.claude/

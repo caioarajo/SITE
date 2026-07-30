@@ -5,17 +5,59 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { UserRole } from "@/lib/types";
 
-const LINKS = [
-  { href: "/admin", label: "Dashboard", icon: "grid" },
-  { href: "/admin/leads", label: "Leads", icon: "inbox" },
-  { href: "/admin/portfolio", label: "Portfólio", icon: "image" },
-  { href: "/admin/depoimentos", label: "Depoimentos", icon: "quote" },
-  { href: "/admin/servicos", label: "Serviços", icon: "tag" },
-  { href: "/admin/faq", label: "FAQ", icon: "help" },
-  { href: "/admin/settings", label: "Configurações", icon: "gear" },
+interface NavLink {
+  href: string;
+  label: string;
+  icon: string;
+}
+
+interface NavGroup {
+  label: string;
+  links: NavLink[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  { label: "Visão Geral", links: [{ href: "/admin", label: "Dashboard", icon: "grid" }] },
+  {
+    label: "Comercial",
+    links: [
+      { href: "/admin/crm", label: "CRM", icon: "funnel" },
+      { href: "/admin/leads", label: "Leads", icon: "inbox" },
+    ],
+  },
+  {
+    label: "Cadastros",
+    links: [
+      { href: "/admin/clientes", label: "Clientes", icon: "users" },
+      { href: "/admin/eventos", label: "Eventos", icon: "calendar" },
+      { href: "/admin/colaboradores", label: "Colaboradores", icon: "badge" },
+      { href: "/admin/fornecedores", label: "Fornecedores", icon: "truck" },
+      { href: "/admin/produtos", label: "Produtos", icon: "box" },
+    ],
+  },
+  {
+    label: "Financeiro",
+    links: [
+      { href: "/admin/financeiro/contas-a-pagar", label: "Contas a Pagar", icon: "arrow-up-circle" },
+      { href: "/admin/financeiro/contas-a-receber", label: "Contas a Receber", icon: "arrow-down-circle" },
+    ],
+  },
+  {
+    label: "Site",
+    links: [
+      { href: "/admin/portfolio", label: "Portfólio", icon: "image" },
+      { href: "/admin/depoimentos", label: "Depoimentos", icon: "quote" },
+      { href: "/admin/servicos", label: "Serviços", icon: "tag" },
+      { href: "/admin/faq", label: "FAQ", icon: "help" },
+      { href: "/admin/settings", label: "Configurações", icon: "gear" },
+    ],
+  },
 ];
 
-const ADMIN_ONLY_LINKS = [{ href: "/admin/usuarios", label: "Usuários", icon: "users" }];
+const ADMIN_ONLY_GROUP: NavGroup = {
+  label: "Administração",
+  links: [{ href: "/admin/usuarios", label: "Usuários", icon: "users-cog" }],
+};
 
 const ICONS: Record<string, React.ReactNode> = {
   grid: (
@@ -72,12 +114,63 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M21.5 20c0-2.8-2-5.1-4.6-5.8" strokeLinecap="round" />
     </svg>
   ),
+  "users-cog": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="8" cy="8" r="3" />
+      <path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6" strokeLinecap="round" />
+      <circle cx="18" cy="16" r="2.4" />
+      <path d="M18 12.2v.8M18 18.6v.8M21.4 14.3l-.7.4M15.3 16.9l-.7.4M21.4 17.7l-.7-.4M15.3 15.1l-.7-.4" strokeLinecap="round" />
+    </svg>
+  ),
+  funnel: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  calendar: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" strokeLinecap="round" />
+    </svg>
+  ),
+  badge: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="9" r="4" />
+      <path d="M7 21l1.5-6M17 21l-1.5-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  truck: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M2 7h13v10H2z" strokeLinejoin="round" />
+      <path d="M15 10h4l3 3v4h-7z" strokeLinejoin="round" />
+      <circle cx="6.5" cy="18" r="1.6" />
+      <circle cx="17.5" cy="18" r="1.6" />
+    </svg>
+  ),
+  box: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M21 8l-9-5-9 5 9 5 9-5z" strokeLinejoin="round" />
+      <path d="M3 8v8l9 5 9-5V8M12 13v8" strokeLinejoin="round" />
+    </svg>
+  ),
+  "arrow-up-circle": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 16V8M8.5 11.5L12 8l3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  "arrow-down-circle": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v8M8.5 12.5L12 16l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 export default function AdminSidebar({ userEmail, role }: { userEmail: string; role: UserRole }) {
   const pathname = usePathname();
   const router = useRouter();
-  const links = role === "admin" ? [...LINKS, ...ADMIN_ONLY_LINKS] : LINKS;
+  const groups = role === "admin" ? [...NAV_GROUPS, ADMIN_ONLY_GROUP] : NAV_GROUPS;
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -96,15 +189,20 @@ export default function AdminSidebar({ userEmail, role }: { userEmail: string; r
       </div>
 
       <nav>
-        {links.map((link) => {
-          const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
-          return (
-            <Link key={link.href} href={link.href} className={active ? "active" : ""}>
-              {ICONS[link.icon]}
-              <span>{link.label}</span>
-            </Link>
-          );
-        })}
+        {groups.map((group) => (
+          <div key={group.label}>
+            <div className="nav-group-label">{group.label}</div>
+            {group.links.map((link) => {
+              const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
+              return (
+                <Link key={link.href} href={link.href} className={active ? "active" : ""}>
+                  {ICONS[link.icon]}
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       <div style={{ fontSize: 11, color: "rgba(250,246,239,0.4)", padding: "0 12px 8px" }}>{userEmail}</div>

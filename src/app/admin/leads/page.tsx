@@ -1,20 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateTime, formatDate, statusLabels } from "@/lib/utils";
 import type { LeadRow, EventStatus } from "@/lib/types";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<LeadRow[]>([]);
+  const [promotedLeadIds, setPromotedLeadIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("todos");
+  const [promoting, setPromoting] = useState<string | null>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
-    setLeads((data as LeadRow[] | null) ?? []);
+    const [leadsRes, opportunitiesRes] = await Promise.all([
+      supabase.from("leads").select("*").order("created_at", { ascending: false }),
+      supabase.from("opportunities").select("lead_id").not("lead_id", "is", null),
+    ]);
+    setLeads((leadsRes.data as LeadRow[] | null) ?? []);
+    setPromotedLeadIds(new Set((opportunitiesRes.data ?? []).map((o) => o.lead_id as string)));
     setLoading(false);
   }
 
@@ -32,6 +40,24 @@ export default function LeadsPage() {
     if (!confirm("Apagar este lead? Essa ação não pode ser desfeita.")) return;
     setLeads((prev) => prev.filter((l) => l.id !== id));
     await supabase.from("leads").delete().eq("id", id);
+  }
+
+  async function promoteToOpportunity(lead: LeadRow) {
+    setPromoting(lead.id);
+    const { error } = await supabase.from("opportunities").insert({
+      lead_id: lead.id,
+      name: lead.name,
+      event_type: lead.event_type,
+      source: "site_form",
+      stage: "novo",
+      notes: lead.message,
+    });
+    setPromoting(null);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    router.push("/admin/crm");
   }
 
   const filtered = filter === "todos" ? leads : leads.filter((l) => l.status === filter);
@@ -87,7 +113,18 @@ export default function LeadsPage() {
                       ))}
                     </select>
                   </td>
-                  <td>
+                  <td className="row-actions">
+                    {promotedLeadIds.has(lead.id) ? (
+                      <span className="status-badge status-confirmado">No CRM</span>
+                    ) : (
+                      <button
+                        className="admin-btn admin-btn-line admin-btn-sm"
+                        onClick={() => promoteToOpportunity(lead)}
+                        disabled={promoting === lead.id}
+                      >
+                        {promoting === lead.id ? "Promovendo..." : "Promover a Oportunidade"}
+                      </button>
+                    )}
                     <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => removeLead(lead.id)}>
                       Apagar
                     </button>
