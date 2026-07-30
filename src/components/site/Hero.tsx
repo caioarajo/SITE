@@ -184,17 +184,6 @@ export default function Hero({ heroPhotoSrc }: { heroPhotoSrc: string }) {
           <motion.div className="hero-photo-frame" style={{ x: photoX, y: photoY }}>
             <img src={heroPhotoSrc} alt="Casal de noivos abraçados em cerimônia organizada pela LP Assessoria e Cerimonial" />
           </motion.div>
-          <div className="hero-badge">
-            <span className="spark">
-              <svg>
-                <use href="#ic-spark" />
-              </svg>
-            </span>
-            <div>
-              <b>Lia Pontes</b>
-              <span>Cerimonialista &amp; assessora</span>
-            </div>
-          </div>
         </motion.div>
       </div>
 
