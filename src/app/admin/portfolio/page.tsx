@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { PortfolioItemRow } from "@/lib/types";
+import type { PortfolioItemRow, PortfolioCategory } from "@/lib/types";
+import { PORTFOLIO_CATEGORIES, PORTFOLIO_CATEGORY_LABELS } from "@/lib/portfolioCategories";
 import Modal from "@/components/admin/Modal";
 
 export default function PortfolioAdminPage() {
@@ -11,6 +12,8 @@ export default function PortfolioAdminPage() {
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [editing, setEditing] = useState<PortfolioItemRow | null>(null);
+  const [uploadCategory, setUploadCategory] = useState<PortfolioCategory>("casamentos");
+  const [filter, setFilter] = useState<PortfolioCategory | "todos">("todos");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -26,12 +29,23 @@ export default function PortfolioAdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const counts = useMemo(() => {
+    const map: Record<string, number> = {};
+    items.forEach((i) => {
+      map[i.category] = (map[i.category] ?? 0) + 1;
+    });
+    return map;
+  }, [items]);
+
+  const visibleItems = filter === "todos" ? items : items.filter((i) => i.category === filter);
+
   const uploadFiles = useCallback(
     async (files: FileList | File[]) => {
       setUploading(true);
       const fileArray = Array.from(files);
+      const sameCategoryCount = items.filter((i) => i.category === uploadCategory).length;
 
-      for (const file of fileArray) {
+      for (const [idx, file] of fileArray.entries()) {
         const isVideo = file.type.startsWith("video/");
         const ext = file.name.split(".").pop();
         const path = `uploads/${crypto.randomUUID()}.${ext}`;
@@ -52,9 +66,10 @@ export default function PortfolioAdminPage() {
           title: file.name.replace(/\.[^.]+$/, ""),
           caption: null,
           media_type: isVideo ? "video" : "image",
+          category: uploadCategory,
           storage_path: path,
           url: publicUrlData.publicUrl,
-          display_order: items.length,
+          display_order: sameCategoryCount + idx,
         });
       }
 
@@ -62,7 +77,7 @@ export default function PortfolioAdminPage() {
       load();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items.length]
+    [items, uploadCategory]
   );
 
   async function removeItem(item: PortfolioItemRow) {
@@ -82,12 +97,19 @@ export default function PortfolioAdminPage() {
     await supabase.from("portfolio_items").update({ is_published: next }).eq("id", item.id);
   }
 
+  async function setCover(item: PortfolioItemRow) {
+    // Só uma capa por categoria: desmarca as demais da mesma categoria antes.
+    setItems((prev) => prev.map((i) => (i.category === item.category ? { ...i, is_cover: i.id === item.id } : i)));
+    await supabase.from("portfolio_items").update({ is_cover: false }).eq("category", item.category);
+    await supabase.from("portfolio_items").update({ is_cover: true }).eq("id", item.id);
+  }
+
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editing) return;
     await supabase
       .from("portfolio_items")
-      .update({ title: editing.title, caption: editing.caption })
+      .update({ title: editing.title, caption: editing.caption, category: editing.category })
       .eq("id", editing.id);
     setItems((prev) => prev.map((i) => (i.id === editing.id ? editing : i)));
     setEditing(null);
@@ -98,51 +120,99 @@ export default function PortfolioAdminPage() {
       <div className="admin-topbar">
         <div>
           <h1>Portfólio</h1>
-          <p>Fotos e vídeos dos trabalhos realizados, exibidos na galeria do site</p>
+          <p>Fotos e vídeos organizados por álbum, exibidos na galeria do site</p>
         </div>
       </div>
 
-      <div
-        className={`upload-dropzone ${dragging ? "dragging" : ""}`}
-        onClick={() => fileInputRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
-        }}
-      >
-        {uploading ? "Enviando..." : "Clique ou arraste fotos e vídeos aqui para adicionar ao portfólio"}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*,video/*"
-          onChange={(e) => e.target.files && uploadFiles(e.target.files)}
-        />
+      <div className="admin-card" style={{ marginBottom: 20 }}>
+        <div className="field-group" style={{ marginBottom: 12, maxWidth: 360 }}>
+          <label className="field-label">Enviar para o álbum</label>
+          <select
+            className="field-select"
+            value={uploadCategory}
+            onChange={(e) => setUploadCategory(e.target.value as PortfolioCategory)}
+          >
+            {PORTFOLIO_CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div
+          className={`upload-dropzone ${dragging ? "dragging" : ""}`}
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+          }}
+        >
+          {uploading
+            ? "Enviando..."
+            : `Clique ou arraste fotos e vídeos aqui para adicionar ao álbum "${PORTFOLIO_CATEGORY_LABELS[uploadCategory]}"`}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,video/*"
+            onChange={(e) => e.target.files && uploadFiles(e.target.files)}
+          />
+        </div>
+      </div>
+
+      <div className="admin-filters-bar" style={{ marginBottom: 20 }}>
+        <button className={`admin-btn admin-btn-sm ${filter === "todos" ? "admin-btn-gold" : "admin-btn-line"}`} onClick={() => setFilter("todos")}>
+          Todos ({items.length})
+        </button>
+        {PORTFOLIO_CATEGORIES.map((c) => (
+          <button
+            key={c.value}
+            className={`admin-btn admin-btn-sm ${filter === c.value ? "admin-btn-gold" : "admin-btn-line"}`}
+            onClick={() => setFilter(c.value)}
+          >
+            {c.label} ({counts[c.value] ?? 0})
+          </button>
+        ))}
       </div>
 
       {loading ? (
         <div className="empty-state">Carregando...</div>
-      ) : items.length === 0 ? (
-        <div className="empty-state">Nenhum item no portfólio ainda.</div>
+      ) : visibleItems.length === 0 ? (
+        <div className="empty-state">Nenhum item neste álbum ainda.</div>
       ) : (
         <div className="media-grid">
-          {items.map((item) => (
+          {visibleItems.map((item) => (
             <div className="media-item" key={item.id} style={{ opacity: item.is_published ? 1 : 0.45 }}>
               {item.media_type === "video" ? <video src={item.url} muted /> : <img src={item.url} alt={item.title} />}
+              {item.is_cover && <span className="cover-badge">Capa</span>}
               <div className="media-overlay">
-                <span className="cap">{item.title}</span>
+                <span className="cap">
+                  {item.title}
+                  <br />
+                  <small>{PORTFOLIO_CATEGORY_LABELS[item.category]}</small>
+                </span>
               </div>
               <div className="media-actions">
                 <button onClick={() => setEditing(item)} title="Editar">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M12 20h9" strokeLinecap="round" />
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button onClick={() => setCover(item)} title="Definir como capa do álbum">
+                  <svg viewBox="0 0 24 24" fill={item.is_cover ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
+                    <path
+                      d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.8L12 3z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
                 <button onClick={() => togglePublished(item)} title={item.is_published ? "Ocultar do site" : "Publicar no site"}>
@@ -165,6 +235,20 @@ export default function PortfolioAdminPage() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Editar item do portfólio">
         {editing && (
           <form onSubmit={saveEdit}>
+            <div className="field-group">
+              <label className="field-label">Álbum</label>
+              <select
+                className="field-select"
+                value={editing.category}
+                onChange={(e) => setEditing({ ...editing, category: e.target.value as PortfolioCategory })}
+              >
+                {PORTFOLIO_CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="field-group">
               <label className="field-label">Título</label>
               <input

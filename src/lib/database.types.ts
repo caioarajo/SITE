@@ -585,9 +585,11 @@ export type Database = {
       portfolio_items: {
         Row: {
           caption: string | null
+          category: string
           created_at: string
           display_order: number
           id: string
+          is_cover: boolean
           is_published: boolean
           media_type: string
           storage_path: string
@@ -596,9 +598,11 @@ export type Database = {
         }
         Insert: {
           caption?: string | null
+          category?: string
           created_at?: string
           display_order?: number
           id?: string
+          is_cover?: boolean
           is_published?: boolean
           media_type?: string
           storage_path: string
@@ -607,9 +611,11 @@ export type Database = {
         }
         Update: {
           caption?: string | null
+          category?: string
           created_at?: string
           display_order?: number
           id?: string
+          is_cover?: boolean
           is_published?: boolean
           media_type?: string
           storage_path?: string

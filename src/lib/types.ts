@@ -20,13 +20,21 @@ export type PayableStatus = "pendente" | "pago" | "cancelado";
 export type ReceivableStatus = "pendente" | "recebido" | "cancelado";
 export type RsvpStatus = "pendente" | "confirmado" | "recusado";
 export type TableShape = "round" | "rectangle";
+export type PortfolioCategory =
+  | "quinze_anos"
+  | "casamentos"
+  | "formaturas"
+  | "empresarial"
+  | "infantil"
+  | "eventos_gerais";
 
 type Tables = Database["public"]["Tables"];
 
 export type ServiceRow = Tables["services"]["Row"];
 
-export type PortfolioItemRow = Omit<Tables["portfolio_items"]["Row"], "media_type"> & {
+export type PortfolioItemRow = Omit<Tables["portfolio_items"]["Row"], "media_type" | "category"> & {
   media_type: MediaType;
+  category: PortfolioCategory;
 };
 
 export type TestimonialRow = Tables["testimonials"]["Row"];
