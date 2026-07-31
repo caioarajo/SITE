@@ -1483,18 +1483,28 @@
 
 .agenda-month-grid{
   display:grid; grid-template-columns:repeat(7,1fr);
-  border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--cream);
+  border:1px solid var(--line); border-radius:8px; background:var(--cream);
 }
 .agenda-weekday{
   padding:10px 8px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:600;
   color:var(--taupe-deep); background:var(--cream-alt); text-align:center; border-bottom:1px solid var(--line);
 }
+.agenda-weekday:first-child{ border-top-left-radius:8px; }
+.agenda-weekday:last-child{ border-top-right-radius:8px; }
 .agenda-day{
   min-height:108px; padding:8px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
-  position:relative; display:flex; flex-direction:column; gap:4px;
+  position:relative; display:flex; flex-direction:column; gap:4px; background:var(--cream);
+  cursor:pointer; transition:transform .22s var(--ease, ease), box-shadow .22s, background .22s;
 }
 .agenda-day:nth-child(7n){ border-right:none; }
 .agenda-day.other-month{ background:var(--cream-alt); opacity:.55; }
+.agenda-day:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 30px -14px rgba(12,24,48,0.38);
+  background:var(--cream-alt);
+  z-index:2;
+}
+.agenda-day.other-month:hover{ opacity:1; }
 .agenda-day.today .agenda-day-num{
   background:var(--gold); color:var(--cream); border-radius:50%;
   width:22px; height:22px; display:flex; align-items:center; justify-content:center;

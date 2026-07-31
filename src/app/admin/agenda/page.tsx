@@ -227,7 +227,11 @@ function AgendaPageContent() {
                 <div
                   key={key}
                   className={`agenda-day ${!isSameMonth(day, month) ? "other-month" : ""} ${isToday(day) ? "today" : ""}`}
-                  onDoubleClick={() => openCreate({ start_at: `${key}T09:00` })}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openCreate({ start_at: `${key}T09:00` })}
+                  onKeyDown={(e) => e.key === "Enter" && openCreate({ start_at: `${key}T09:00` })}
+                  title="Clique para criar um compromisso neste dia"
                 >
                   <span className="agenda-day-num">{format(day, "d")}</span>
                   <div className="agenda-day-items">
@@ -236,14 +240,23 @@ function AgendaPageContent() {
                         key={item.id}
                         className="agenda-item-pill"
                         style={{ ["--dotcolor" as string]: AGENDA_CATEGORY_COLORS[item.category] }}
-                        onClick={() => openEdit(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEdit(item);
+                        }}
                         title={item.title}
                       >
                         {item.title}
                       </div>
                     ))}
                     {extra > 0 && (
-                      <button className="agenda-day-more" onClick={() => setDayModal(day)}>
+                      <button
+                        className="agenda-day-more"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDayModal(day);
+                        }}
+                      >
                         +{extra} mais
                       </button>
                     )}
