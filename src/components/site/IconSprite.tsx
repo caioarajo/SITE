@@ -66,6 +66,9 @@ export default function IconSprite() {
         <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
         <path stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" d="M20 20l-4.3-4.3M11 8.3v5.4M8.3 11h5.4" />
       </symbol>
+      <symbol id="ic-play" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M8 5.5v13l11-6.5-11-6.5z" />
+      </symbol>
       <symbol id="ic-close" viewBox="0 0 24 24">
         <path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" d="M5 5l14 14M19 5L5 19" />
       </symbol>

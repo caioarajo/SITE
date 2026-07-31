@@ -592,6 +592,7 @@ export type Database = {
           is_cover: boolean
           is_published: boolean
           media_type: string
+          poster_url: string | null
           storage_path: string
           title: string
           url: string
@@ -605,6 +606,7 @@ export type Database = {
           is_cover?: boolean
           is_published?: boolean
           media_type?: string
+          poster_url?: string | null
           storage_path: string
           title: string
           url: string
@@ -618,6 +620,7 @@ export type Database = {
           is_cover?: boolean
           is_published?: boolean
           media_type?: string
+          poster_url?: string | null
           storage_path?: string
           title?: string
           url?: string

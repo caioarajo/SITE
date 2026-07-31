@@ -854,6 +854,19 @@
   .gitem:hover::after{opacity:1;}
   .gitem:hover .zoom-icon{opacity:1; transform:translateY(0);}
 
+  .video-play-badge{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:46px; height:46px; border-radius:50%;
+    background:rgba(12,24,48,0.55); backdrop-filter:blur(1px);
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none; z-index:1;
+  }
+  .video-play-badge svg{ width:18px; height:18px; color:var(--cream); margin-left:2px; }
+  .segment-thumb .video-play-badge{ width:38px; height:38px; }
+  .segment-thumb .video-play-badge svg{ width:15px; height:15px; }
+
+  .gallery-sentinel{ height:1px; }
+
   .gi-1{grid-column:span 2; grid-row:span 2;}
   .gi-2{grid-column:span 2; grid-row:span 1;}
   .gi-3{grid-column:span 1; grid-row:span 1;}

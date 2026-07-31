@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { PortfolioItemRow, PortfolioCategory } from "@/lib/types";
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_CATEGORY_LABELS } from "@/lib/portfolioCategories";
+import { captureVideoFrame } from "@/lib/videoPoster";
 import Modal from "@/components/admin/Modal";
 
 export default function PortfolioAdminPage() {
@@ -62,6 +63,22 @@ export default function PortfolioAdminPage() {
 
         const { data: publicUrlData } = supabase.storage.from("portfolio").getPublicUrl(path);
 
+        // Vídeo: captura um frame no navegador e sobe como poster — a
+        // miniatura fica leve (imagem) em vez de precisar do vídeo inteiro.
+        let posterUrl: string | null = null;
+        if (isVideo) {
+          const posterBlob = await captureVideoFrame(file);
+          if (posterBlob) {
+            const posterPath = `uploads/posters/${crypto.randomUUID()}.jpg`;
+            const { error: posterError } = await supabase.storage
+              .from("portfolio")
+              .upload(posterPath, posterBlob, { cacheControl: "3600", contentType: "image/jpeg" });
+            if (!posterError) {
+              posterUrl = supabase.storage.from("portfolio").getPublicUrl(posterPath).data.publicUrl;
+            }
+          }
+        }
+
         await supabase.from("portfolio_items").insert({
           title: file.name.replace(/\.[^.]+$/, ""),
           caption: null,
@@ -69,6 +86,7 @@ export default function PortfolioAdminPage() {
           category: uploadCategory,
           storage_path: path,
           url: publicUrlData.publicUrl,
+          poster_url: posterUrl,
           display_order: sameCategoryCount + idx,
         });
       }
@@ -84,8 +102,14 @@ export default function PortfolioAdminPage() {
     if (!confirm(`Apagar "${item.title}"? Essa ação não pode ser desfeita.`)) return;
     // Só tenta apagar do Storage se o arquivo foi enviado por aqui
     // (itens "seed" apontam para /public e não têm objeto no bucket).
-    if (item.storage_path.startsWith("uploads/")) {
-      await supabase.storage.from("portfolio").remove([item.storage_path]);
+    const toRemove: string[] = [];
+    if (item.storage_path.startsWith("uploads/")) toRemove.push(item.storage_path);
+    if (item.poster_url) {
+      const posterPath = item.poster_url.split("/object/public/portfolio/")[1];
+      if (posterPath) toRemove.push(posterPath);
+    }
+    if (toRemove.length > 0) {
+      await supabase.storage.from("portfolio").remove(toRemove);
     }
     await supabase.from("portfolio_items").delete().eq("id", item.id);
     setItems((prev) => prev.filter((i) => i.id !== item.id));
@@ -190,7 +214,11 @@ export default function PortfolioAdminPage() {
         <div className="media-grid">
           {visibleItems.map((item) => (
             <div className="media-item" key={item.id} style={{ opacity: item.is_published ? 1 : 0.45 }}>
-              {item.media_type === "video" ? <video src={item.url} muted /> : <img src={item.url} alt={item.title} />}
+              {item.media_type === "video" ? (
+                <video src={item.url} poster={item.poster_url ?? undefined} muted />
+              ) : (
+                <img src={item.url} alt={item.title} />
+              )}
               {item.is_cover && <span className="cover-badge">Capa</span>}
               <div className="media-overlay">
                 <span className="cap">
