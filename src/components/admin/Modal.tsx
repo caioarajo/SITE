@@ -43,6 +43,11 @@ export default function Modal({
             transition={{ duration: 0.25, ease: [0.16, 0.84, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
           >
+            <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
+              <svg viewBox="0 0 24 24">
+                <use href="#ic-close" />
+              </svg>
+            </button>
             <h2>{title}</h2>
             {children}
           </motion.div>

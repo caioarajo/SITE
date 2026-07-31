@@ -1357,9 +1357,19 @@
   width:100%; max-width:560px; max-height:88vh; overflow-y:auto;
   background:var(--cream); border-radius:10px; padding:32px;
   box-shadow:0 50px 100px -30px rgba(0,0,0,.5);
+  position:relative;
 }
-.modal h2{ font-family:'Playfair Display', serif; font-style:italic; font-size:21px; margin-bottom:22px; }
+.modal h2{ font-family:'Playfair Display', serif; font-style:italic; font-size:21px; margin-bottom:22px; padding-right:30px; }
 .modal-actions{ display:flex; justify-content:flex-end; gap:12px; margin-top:24px; }
+.modal-close{
+  position:absolute; top:16px; right:16px;
+  width:30px; height:30px; border-radius:50%; border:none;
+  background:var(--cream-alt); color:var(--taupe-deep); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s, color .2s;
+}
+.modal-close:hover{ background:var(--espresso); color:var(--cream); }
+.modal-close svg{ width:13px; height:13px; }
 
 /* Toast (feedback de sucesso/erro em ações do admin) */
 .toast-stack{
