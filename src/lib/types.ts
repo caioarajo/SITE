@@ -12,7 +12,7 @@ export type MediaType = "image" | "video";
 export type UserRole = "admin" | "usuario_avancado" | "cliente";
 
 export type ClientType = "pessoa_fisica" | "pessoa_juridica";
-export type EventCategory = "casamento" | "debutante" | "corporativo" | "aniversario" | "outro";
+export type EventCategory = "casamento" | "debutante" | "formatura" | "corporativo" | "infantil" | "aniversario" | "outro";
 export type EventRecordStatus = "planejamento" | "confirmado" | "em_andamento" | "concluido" | "cancelado";
 export type OpportunitySource = "site_form" | "whatsapp" | "manual" | "indicacao" | "outro";
 export type OpportunityStage = "novo" | "qualificando" | "proposta" | "negociacao" | "ganho" | "perdido";
@@ -27,6 +27,11 @@ export type PortfolioCategory =
   | "empresarial"
   | "infantil"
   | "eventos_gerais";
+
+export type AgendaCategory = "reuniao" | "visita_tecnica" | "degustacao" | "prazo_fornecedor" | "dia_evento" | "interno";
+export type AgendaStatus = "pendente" | "em_andamento" | "concluido";
+export type AgendaLocationType = "presencial" | "online";
+export type AgendaPriority = "baixa" | "normal" | "alta" | "critica";
 
 type Tables = Database["public"]["Tables"];
 
@@ -92,6 +97,29 @@ export type EventTableRow = Omit<Tables["event_tables"]["Row"], "shape"> & {
 };
 
 export type EventSeatRow = Tables["event_seats"]["Row"];
+
+export type AgendaTemplateRow = Omit<Tables["agenda_templates"]["Row"], "event_type"> & {
+  event_type: EventCategory;
+};
+
+export type AgendaTemplateItemRow = Omit<Tables["agenda_template_items"]["Row"], "category"> & {
+  category: AgendaCategory;
+};
+
+export type AgendaItemRow = Omit<Tables["agenda_items"]["Row"], "category" | "location_type" | "priority" | "status"> & {
+  category: AgendaCategory;
+  location_type: AgendaLocationType;
+  priority: AgendaPriority;
+  status: AgendaStatus;
+};
+
+export type AgendaItemAttachmentRow = Tables["agenda_item_attachments"]["Row"];
+
+export type AgendaReminder = {
+  offset_minutes: number;
+  channel: "sistema" | "email" | "whatsapp";
+  recipient: "cliente" | "fornecedor" | "equipe";
+};
 
 // Combinação de public.profiles + auth.users (email, último acesso), montada
 // pela rota /api/admin/users — não existe como uma única tabela no banco.

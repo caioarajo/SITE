@@ -1459,3 +1459,95 @@
 @media (max-width: 900px){
   .table-map-canvas{ height:480px; }
 }
+
+/* ---------- Agenda: categorias, calendário mensal, kanban, timeline ---------- */
+.agenda-chip{ display:inline-flex; align-items:center; gap:7px; font-size:13px; }
+.agenda-dot{ width:9px; height:9px; border-radius:50%; flex:none; background:var(--dotcolor, var(--gold)); }
+
+.agenda-toolbar{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+  margin-bottom:18px;
+}
+.agenda-month-nav{ display:flex; align-items:center; gap:10px; }
+.agenda-month-nav h2{ font-size:19px; font-style:italic; min-width:170px; text-align:center; }
+.agenda-month-nav button{
+  width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--cream);
+  cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--espresso);
+}
+.agenda-month-nav button:hover{ background:var(--cream-alt); }
+.agenda-filters{ display:flex; gap:10px; flex-wrap:wrap; }
+.agenda-filters select{ min-width:150px; }
+
+.agenda-layout{ display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+@media (max-width:1100px){ .agenda-layout{ grid-template-columns:1fr; } }
+
+.agenda-month-grid{
+  display:grid; grid-template-columns:repeat(7,1fr);
+  border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--cream);
+}
+.agenda-weekday{
+  padding:10px 8px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:600;
+  color:var(--taupe-deep); background:var(--cream-alt); text-align:center; border-bottom:1px solid var(--line);
+}
+.agenda-day{
+  min-height:108px; padding:8px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+  position:relative; display:flex; flex-direction:column; gap:4px;
+}
+.agenda-day:nth-child(7n){ border-right:none; }
+.agenda-day.other-month{ background:var(--cream-alt); opacity:.55; }
+.agenda-day.today .agenda-day-num{
+  background:var(--gold); color:var(--cream); border-radius:50%;
+  width:22px; height:22px; display:flex; align-items:center; justify-content:center;
+}
+.agenda-day-num{ font-size:12.5px; font-weight:600; color:var(--espresso); }
+.agenda-day-items{ display:flex; flex-direction:column; gap:3px; overflow:hidden; }
+.agenda-item-pill{
+  display:flex; align-items:center; gap:5px; font-size:10.5px; padding:2px 6px; border-radius:4px;
+  background:var(--cream-alt); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  border-left:3px solid var(--dotcolor, var(--gold));
+}
+.agenda-item-pill:hover{ background:var(--taupe); color:var(--cream); }
+.agenda-day-more{ font-size:10px; color:var(--taupe-deep); cursor:pointer; background:none; border:none; text-align:left; padding:0; }
+
+.agenda-side{ display:flex; flex-direction:column; gap:20px; }
+.agenda-side .admin-card h2{ font-size:15px; margin-bottom:14px; }
+.agenda-side-item{
+  display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid var(--line);
+  font-size:12.5px; cursor:pointer;
+}
+.agenda-side-item:last-child{ border-bottom:none; }
+.agenda-side-item .agenda-dot{ margin-top:5px; }
+.agenda-side-item b{ display:block; font-weight:600; color:var(--espresso); }
+.agenda-side-item span{ color:var(--taupe-deep); }
+.agenda-side-item.overdue b{ color:#a1382a; }
+
+.agenda-legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:18px; font-size:12.5px; color:var(--taupe-deep); }
+
+/* Kanban da agenda — reaproveita .kanban-board/.kanban-column/.kanban-card do CRM */
+.agenda-kanban-card .agenda-chip{ margin-bottom:6px; }
+.agenda-kanban-card .meta-line{ font-size:11.5px; color:var(--taupe-deep); margin-bottom:4px; }
+
+/* Linha do tempo de um evento */
+.event-timeline{ position:relative; padding-left:28px; }
+.event-timeline::before{ content:""; position:absolute; left:9px; top:6px; bottom:6px; width:1px; background:var(--line); }
+.timeline-row{ position:relative; padding-bottom:26px; }
+.timeline-row:last-child{ padding-bottom:0; }
+.timeline-row::before{
+  content:""; position:absolute; left:-28px; top:4px; width:12px; height:12px; border-radius:50%;
+  background:var(--dotcolor, var(--taupe)); border:2px solid var(--cream); box-shadow:0 0 0 1px var(--line);
+}
+.timeline-row.peak::before{ width:16px; height:16px; left:-30px; top:2px; }
+.timeline-card{
+  background:var(--cream-alt); border-radius:8px; padding:14px 16px; cursor:pointer;
+  transition:box-shadow .2s;
+}
+.timeline-card:hover{ box-shadow:0 10px 24px -16px rgba(12,24,48,.35); }
+.timeline-row.peak .timeline-card{ background:color-mix(in srgb, var(--dotcolor) 12%, var(--cream-alt)); }
+.timeline-offset{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--taupe-deep); margin-bottom:4px; }
+.timeline-title{ font-weight:600; font-size:14.5px; color:var(--espresso); margin-bottom:4px; }
+.timeline-meta{ display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; color:var(--taupe-deep); }
+
+@media (max-width:640px){
+  .agenda-day{ min-height:72px; }
+}
+

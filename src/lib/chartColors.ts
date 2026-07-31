@@ -10,6 +10,7 @@ export const ESPRESSO = "#8f7c66";
 export const GREEN = "#3a8a5c";
 export const RED = "#b3311c";
 export const SLATE = "#6b7a8f";
+export const WINE = "#7a1533";
 
 export const CATEGORY_PALETTE = [NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN, SLATE, RED];
 

@@ -32,7 +32,9 @@ const STATUS_LABELS: Record<EventRecordStatus, string> = {
 const TYPE_LABELS: Record<EventCategory, string> = {
   casamento: "Casamento",
   debutante: "15 anos",
+  formatura: "Formatura",
   corporativo: "Corporativo",
+  infantil: "Infantil",
   aniversario: "Aniversário",
   outro: "Outro",
 };
@@ -143,6 +145,9 @@ function EventosPageContent() {
                     <span className={`status-badge status-${item.status}`}>{STATUS_LABELS[item.status]}</span>
                   </td>
                   <td className="row-actions">
+                    <Link href={`/admin/eventos/${item.id}/agenda`} className="admin-btn admin-btn-line admin-btn-sm">
+                      Agenda
+                    </Link>
                     <Link href={`/admin/eventos/${item.id}/mesas`} className="admin-btn admin-btn-line admin-btn-sm">
                       Mapa de Mesas
                     </Link>

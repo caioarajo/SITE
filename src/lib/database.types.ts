@@ -152,6 +152,259 @@ export type Database = {
           },
         ]
       }
+      agenda_item_attachments: {
+        Row: {
+          agenda_item_id: string
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          agenda_item_id: string
+          created_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          agenda_item_id?: string
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_item_attachments_agenda_item_id_fkey"
+            columns: ["agenda_item_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_item_attachments_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_items: {
+        Row: {
+          all_day: boolean
+          category: string
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_at: string | null
+          event_id: string | null
+          id: string
+          location: string | null
+          location_type: string
+          meeting_link: string | null
+          meeting_minutes: string | null
+          priority: string
+          reminders: Json
+          responsible_id: string | null
+          start_at: string
+          status: string
+          supplier_confirmed_at: string | null
+          supplier_id: string | null
+          supplier_invite_token: string | null
+          template_id: string | null
+          template_item_id: string | null
+          title: string
+          updated_at: string
+          visible_to_client: boolean
+        }
+        Insert: {
+          all_day?: boolean
+          category: string
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_at?: string | null
+          event_id?: string | null
+          id?: string
+          location?: string | null
+          location_type?: string
+          meeting_link?: string | null
+          meeting_minutes?: string | null
+          priority?: string
+          reminders?: Json
+          responsible_id?: string | null
+          start_at: string
+          status?: string
+          supplier_confirmed_at?: string | null
+          supplier_id?: string | null
+          supplier_invite_token?: string | null
+          template_id?: string | null
+          template_item_id?: string | null
+          title: string
+          updated_at?: string
+          visible_to_client?: boolean
+        }
+        Update: {
+          all_day?: boolean
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_at?: string | null
+          event_id?: string | null
+          id?: string
+          location?: string | null
+          location_type?: string
+          meeting_link?: string | null
+          meeting_minutes?: string | null
+          priority?: string
+          reminders?: Json
+          responsible_id?: string | null
+          start_at?: string
+          status?: string
+          supplier_confirmed_at?: string | null
+          supplier_id?: string | null
+          supplier_invite_token?: string | null
+          template_id?: string | null
+          template_item_id?: string | null
+          title?: string
+          updated_at?: string
+          visible_to_client?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_responsible_id_fkey"
+            columns: ["responsible_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_items_template_item_id_fkey"
+            columns: ["template_item_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_template_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_template_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          offset_days: number
+          order_index: number
+          template_id: string
+          title: string
+          visible_to_client: boolean
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          offset_days: number
+          order_index?: number
+          template_id: string
+          title: string
+          visible_to_client?: boolean
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          offset_days?: number
+          order_index?: number
+          template_id?: string
+          title?: string
+          visible_to_client?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_type: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_type: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_type?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
@@ -665,6 +918,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          client_id: string | null
           created_at: string
           id: string
           is_active: boolean
@@ -674,6 +928,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           id: string
           is_active?: boolean
@@ -683,6 +938,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -691,7 +947,15 @@ export type Database = {
           role?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {

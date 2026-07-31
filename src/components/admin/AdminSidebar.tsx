@@ -17,7 +17,13 @@ interface NavGroup {
 }
 
 const NAV_GROUPS: NavGroup[] = [
-  { label: "Visão Geral", links: [{ href: "/admin", label: "Dashboard", icon: "grid" }] },
+  {
+    label: "Visão Geral",
+    links: [
+      { href: "/admin", label: "Dashboard", icon: "grid" },
+      { href: "/admin/agenda", label: "Agenda", icon: "clock" },
+    ],
+  },
   {
     label: "Comercial",
     links: [
@@ -133,6 +139,12 @@ const ICONS: Record<string, React.ReactNode> = {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" strokeLinecap="round" />
+    </svg>
+  ),
+  clock: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
   badge: (
