@@ -8,6 +8,7 @@ export default function About({ liaPortraitSrc }: { liaPortraitSrc: string }) {
       <div className="wrap">
         <Reveal className="about-photo">
           <div className="ring" />
+          <span className="mat" aria-hidden="true" />
           <div className="frame">
             <img src={liaPortraitSrc} alt="Lia Pontes, cerimonialista e assessora de eventos" />
           </div>

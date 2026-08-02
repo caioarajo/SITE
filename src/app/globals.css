@@ -616,7 +616,20 @@
   .about{background:var(--cream);}
   .about .wrap{display:grid; grid-template-columns:0.62fr 1fr; gap:70px; align-items:center;}
   .about-photo{position:relative;}
+  /* Moldura em duas camadas, no mesmo espírito do retrato do hero: um
+     contorno dourado recuado (passe-partout) acompanhando o arco, com o
+     anel fino no canto por trás como assinatura. */
+  .about-photo .mat{
+    position:absolute;
+    inset:-14px;
+    border-radius:224px 224px 30px 30px;
+    border:1px solid rgba(171,127,63,0.55);
+    pointer-events:none;
+    z-index:0;
+  }
   .about-photo .frame{
+    position:relative;
+    z-index:1;
     border-radius:210px 210px 16px 16px;
     overflow:hidden;
     box-shadow:var(--shadow);
@@ -627,6 +640,9 @@
     position:absolute; inset:-18px -18px auto auto; width:120px; height:120px;
     border:1px solid var(--gold); border-radius:50%;
     opacity:.5; z-index:-1;
+  }
+  @media (max-width:600px){
+    .about-photo .mat{inset:-10px; border-radius:180px 180px 24px 24px;}
   }
   .about-body p{color:#4a4038; font-size:16.5px; margin-top:20px;}
   .about-body p.big{
