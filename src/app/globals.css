@@ -222,7 +222,9 @@
      descendentes fixos e quebrava a cobertura de tela cheia do menu. */
   .nav-scrim{
     position:fixed; inset:0; z-index:150;
-    background:rgba(9,15,28,0.55);
+    background:rgba(9,15,28,0.32);
+    backdrop-filter:blur(7px);
+    -webkit-backdrop-filter:blur(7px);
     opacity:0; pointer-events:none;
     transition:opacity .4s var(--ease);
   }
