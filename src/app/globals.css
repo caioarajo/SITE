@@ -165,7 +165,11 @@
   header.scrolled .brand img.logo-light{opacity:0;}
   header.scrolled .brand img.logo-dark{opacity:1;}
   header nav{display:flex; align-items:center; gap:38px;}
-  header nav a{
+  /* .nav-link estiliza tanto a nav de desktop (dentro do header) quanto o
+     drawer mobile (portalizado para fora do header, ver Header.tsx) — por
+     isso a cor base já é clara: funciona tanto sobre o header transparente
+     quanto sobre o fundo navy-deep fixo do drawer. */
+  .nav-link{
     font-size:12.5px;
     letter-spacing:.14em;
     text-transform:uppercase;
@@ -173,14 +177,14 @@
     position:relative;
     padding-bottom:4px;
   }
-  header nav a::after{
+  .nav-link::after{
     content:"";
     position:absolute; left:0; right:100%; bottom:0; height:1px;
     background:var(--gold);
     transition:right .35s var(--ease);
   }
-  header nav a:hover::after{right:0;}
-  header nav a:hover{color:var(--cream);}
+  .nav-link:hover::after{right:0;}
+  .nav-link:hover{color:var(--cream);}
   header .cta-wrap{display:flex; align-items:center; gap:22px;}
   /* "Contato"/"Entrar"/"Painel" já existem como botão em .cta-wrap — esta
      versão em texto só aparece dentro do menu mobile (ver media query
@@ -193,20 +197,48 @@
     box-shadow:0 8px 30px -18px rgba(12,24,48,0.35);
     padding:10px 0;
   }
-  header.scrolled nav a{color:var(--espresso);}
-  header.scrolled nav a:hover{color:var(--navy);}
+  header.scrolled .site-nav-desktop .nav-link{color:var(--espresso);}
+  header.scrolled .site-nav-desktop .nav-link:hover{color:var(--navy);}
   header.scrolled .btn-ghost{border-color:var(--espresso); color:var(--espresso);}
   header.scrolled .btn-ghost:hover{background:var(--espresso); color:var(--cream);}
 
   .menu-toggle{
     display:none;
+    position:relative;
+    z-index:170;
     flex-direction:column;
     gap:5px;
     background:none; border:none; cursor:pointer;
     padding:6px;
   }
-  .menu-toggle span{width:24px; height:1.5px; background:var(--cream); transition:.3s;}
+  .menu-toggle span{width:24px; height:1.5px; background:var(--cream); transition:transform .3s var(--ease), opacity .2s var(--ease), background .3s;}
   header.scrolled .menu-toggle span{background:var(--espresso);}
+  .menu-toggle.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+  .menu-toggle.open span:nth-child(2){opacity:0;}
+  .menu-toggle.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+  /* Drawer mobile — portalizado para <body> (ver Header.tsx) para não herdar
+     o "backdrop-filter" do header, que cria um containing block para
+     descendentes fixos e quebrava a cobertura de tela cheia do menu. */
+  .nav-scrim{
+    position:fixed; inset:0; z-index:150;
+    background:rgba(9,15,28,0.55);
+    opacity:0; pointer-events:none;
+    transition:opacity .4s var(--ease);
+  }
+  .nav-scrim.open{opacity:1; pointer-events:auto;}
+
+  .nav-drawer{
+    position:fixed; inset:0 0 0 auto; z-index:160;
+    width:78%; max-width:340px;
+    background:var(--navy-deep);
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+    gap:26px; padding:40px;
+    transform:translateX(100%);
+    transition:transform .45s var(--ease);
+  }
+  .nav-drawer.open{transform:translateX(0); box-shadow:-20px 0 50px rgba(0,0,0,.3);}
+  .nav-drawer .nav-link{color:var(--cream); font-size:14px;}
 
   /* ---------- Hero ---------- */
   .hero{
@@ -333,16 +365,7 @@
   @keyframes scrolldown{0%{opacity:0; transform:scaleY(0.4); transform-origin:top;} 40%{opacity:1; transform:scaleY(1); transform-origin:top;} 100%{opacity:0; transform:scaleY(1); transform-origin:bottom;}}
 
   @media (max-width: 940px){
-    header nav{
-      position:fixed; inset:0 0 0 auto; width:78%; max-width:340px;
-      background:var(--navy-deep);
-      flex-direction:column; align-items:flex-start; justify-content:center;
-      gap:26px; padding:40px;
-      transform:translateX(100%);
-      transition:transform .45s var(--ease);
-    }
-    header nav.open{transform:translateX(0); box-shadow:-20px 0 50px rgba(0,0,0,.3);}
-    header nav a{color:var(--cream); font-size:14px;}
+    .site-nav-desktop{display:none;}
     header .cta-wrap .btn-ghost{display:none;}
     .nav-cta-duplicate{display:block;}
     .menu-toggle{display:flex;}
