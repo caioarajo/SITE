@@ -1,17 +1,43 @@
+"use client";
+
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import type { MouseEvent } from "react";
 import Reveal from "./Reveal";
 
 const NICHES = ["15 anos", "Casamentos", "Formaturas", "Empresarial", "Infantil", "Eventos em geral"];
 
 export default function About({ liaPortraitSrc }: { liaPortraitSrc: string }) {
+  // Mesmo efeito de parallax sutil do retrato do hero: a foto acompanha o
+  // mouse por poucos pixels dentro da seção.
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const mouseX = useSpring(rawX, { stiffness: 120, damping: 20 });
+  const mouseY = useSpring(rawY, { stiffness: 120, damping: 20 });
+  const photoX = useTransform(mouseX, (v) => v * 8);
+  const photoY = useTransform(mouseY, (v) => v * 8);
+
+  function handleMouseMove(e: MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    rawX.set((e.clientX - rect.left) / rect.width - 0.5);
+    rawY.set((e.clientY - rect.top) / rect.height - 0.5);
+  }
+
+  function handleMouseLeave() {
+    rawX.set(0);
+    rawY.set(0);
+  }
+
   return (
-    <section className="about" id="sobre">
+    <section className="about" id="sobre" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
       <div className="wrap">
         <Reveal className="about-photo">
-          <div className="ring" />
-          <span className="mat" aria-hidden="true" />
-          <div className="frame">
-            <img src={liaPortraitSrc} alt="Lia Pontes, cerimonialista e assessora de eventos" />
-          </div>
+          <motion.div className="about-photo-inner" style={{ x: photoX, y: photoY }}>
+            <div className="ring" />
+            <span className="mat" aria-hidden="true" />
+            <div className="frame">
+              <img src={liaPortraitSrc} alt="Lia Pontes, cerimonialista e assessora de eventos" />
+            </div>
+          </motion.div>
           <div className="about-seal">
             <span className="cross-wrap">
               <svg className="cross-glow">
