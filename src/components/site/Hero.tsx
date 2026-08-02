@@ -181,8 +181,14 @@ export default function Hero({ heroPhotoSrc, whatsappNumber }: { heroPhotoSrc: s
         </motion.div>
 
         <motion.div className="hero-visual" variants={photoVariant} initial="hidden" animate="show">
-          <motion.div className="hero-photo-frame" style={{ x: photoX, y: photoY }}>
-            <img src={heroPhotoSrc} alt="Casal de noivos abraçados em cerimônia organizada pela LP Assessoria e Cerimonial" />
+          <motion.div className="hero-photo-outer" style={{ x: photoX, y: photoY }}>
+            <span className="hero-photo-mat" aria-hidden="true" />
+            <div className="hero-photo-frame">
+              <img
+                src={heroPhotoSrc}
+                alt="Noivos abraçados diante do altar, sob um arco com cruz, em cerimônia organizada pela LP Assessoria e Cerimonial"
+              />
+            </div>
           </motion.div>
         </motion.div>
       </div>

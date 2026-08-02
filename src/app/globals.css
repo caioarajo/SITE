@@ -276,9 +276,23 @@
     display:flex;
     justify-content:center;
   }
-  .hero-photo-frame{
+  .hero-photo-outer{
     position:relative;
     width:min(100%, 400px);
+  }
+  .hero-photo-mat{
+    position:absolute;
+    inset:-16px;
+    border-radius:226px 226px 34px 34px;
+    border:1px solid rgba(231,184,120,0.55);
+    box-shadow:0 0 0 1px rgba(250,246,239,0.08);
+    pointer-events:none;
+    z-index:0;
+  }
+  .hero-photo-frame{
+    position:relative;
+    z-index:1;
+    width:100%;
     border-radius:210px 210px 20px 20px;
     overflow:hidden;
     aspect-ratio:4/5.1;
@@ -287,6 +301,9 @@
     transition: transform .3s ease-out;
   }
   .hero-photo-frame img{width:100%; height:100%; object-fit:cover;}
+  @media (max-width:600px){
+    .hero-photo-mat{inset:-11px; border-radius:170px 170px 26px 26px;}
+  }
   .hero-badge{
     position:absolute;
     left:-26px;
