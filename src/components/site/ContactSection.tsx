@@ -60,8 +60,11 @@ export default function ContactSection({
   return (
     <section className="contact" id="contato">
       <Reveal className="wrap">
-        <div className="contact-photo">
-          <img src={liaPhotoSrc} alt="Lia Pontes" />
+        <div className="contact-photo-outer">
+          <span className="contact-photo-mat" aria-hidden="true" />
+          <div className="contact-photo">
+            <img src={liaPhotoSrc} alt="Lia Pontes, cerimonialista e assessora de eventos, segurando um tablet" />
+          </div>
         </div>
         <div className="contact-body">
           <div className="eyebrow">
