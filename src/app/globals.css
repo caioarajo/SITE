@@ -1090,6 +1090,7 @@
     .contact .wrap{grid-template-columns:1fr; padding:34px 24px; text-align:center;}
     .contact-photo-outer{max-width:260px; margin:0 auto;}
     .contact-photo-mat{inset:-9px; border-radius:135px 135px 18px 18px;}
+    .contact-body p.lead{margin-left:auto; margin-right:auto;}
     .contact-links a{justify-content:center;}
     .contact-actions{justify-content:center;}
   }
