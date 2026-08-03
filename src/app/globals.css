@@ -637,11 +637,6 @@
     aspect-ratio:3/3.85;
   }
   .about-photo img{width:100%; height:100%; object-fit:cover;}
-  .about-photo .ring{
-    position:absolute; inset:-18px -18px auto auto; width:120px; height:120px;
-    border:1px solid var(--gold); border-radius:50%;
-    opacity:.5; z-index:-1;
-  }
   @media (max-width:600px){
     .about-photo .mat{inset:-10px; border-radius:180px 180px 24px 24px;}
   }
