@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { EventRow, EventCategory, EventRecordStatus, ClientRow } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { EVENT_TYPE_LABELS as TYPE_LABELS, EVENT_STATUS_LABELS as STATUS_LABELS } from "@/lib/eventLabels";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
 
@@ -19,24 +20,6 @@ const emptyForm: Partial<EventRow> = {
   budget_total: null,
   status: "planejamento",
   notes: "",
-};
-
-const STATUS_LABELS: Record<EventRecordStatus, string> = {
-  planejamento: "Planejamento",
-  confirmado: "Confirmado",
-  em_andamento: "Em andamento",
-  concluido: "Concluído",
-  cancelado: "Cancelado",
-};
-
-const TYPE_LABELS: Record<EventCategory, string> = {
-  casamento: "Casamento",
-  debutante: "15 anos",
-  formatura: "Formatura",
-  corporativo: "Corporativo",
-  infantil: "Infantil",
-  aniversario: "Aniversário",
-  outro: "Outro",
 };
 
 function EventosPageContent() {

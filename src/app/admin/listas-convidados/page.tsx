@@ -4,7 +4,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import type { GuestListRow, EventRow } from "@/lib/types";
+import type { GuestListRow, EventRow, RsvpStatus } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
+import { EVENT_TYPE_LABELS } from "@/lib/eventLabels";
 import Modal from "@/components/admin/Modal";
 import { ToastProvider, useToast } from "@/components/admin/Toast";
 
@@ -17,11 +19,31 @@ interface FormState {
 
 const emptyForm: FormState = { name: "", description: "", eventIds: [] };
 
+interface ListStats {
+  total: number;
+  confirmado: number;
+  pendente: number;
+  recusado: number;
+  companions: number;
+}
+
+const emptyStats: ListStats = { total: 0, confirmado: 0, pendente: 0, recusado: 0, companions: 0 };
+
+function addStats(a: ListStats, b: ListStats): ListStats {
+  return {
+    total: a.total + b.total,
+    confirmado: a.confirmado + b.confirmado,
+    pendente: a.pendente + b.pendente,
+    recusado: a.recusado + b.recusado,
+    companions: a.companions + b.companions,
+  };
+}
+
 function ListasConvidadosPageContent() {
-  const [items, setItems] = useState<GuestListRow[]>([]);
+  const [lists, setLists] = useState<GuestListRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
-  const [guestCounts, setGuestCounts] = useState<Record<string, number>>({});
-  const [linkCounts, setLinkCounts] = useState<Record<string, number>>({});
+  const [statsByList, setStatsByList] = useState<Record<string, ListStats>>({});
+  const [eventIdsByList, setEventIdsByList] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
@@ -32,24 +54,29 @@ function ListasConvidadosPageContent() {
     setLoading(true);
     const [listsRes, eventsRes, guestsRes, linksRes] = await Promise.all([
       supabase.from("guest_lists").select("*").order("name", { ascending: true }),
-      supabase.from("events").select("*").order("title", { ascending: true }),
-      supabase.from("guests").select("guest_list_id"),
-      supabase.from("event_guest_lists").select("guest_list_id"),
+      supabase.from("events").select("*").order("event_date", { ascending: true }),
+      supabase.from("guests").select("guest_list_id, rsvp_status, companions"),
+      supabase.from("event_guest_lists").select("event_id, guest_list_id"),
     ]);
-    setItems((listsRes.data as GuestListRow[]) ?? []);
+    setLists((listsRes.data as GuestListRow[]) ?? []);
     setEvents((eventsRes.data as EventRow[]) ?? []);
 
-    const gCounts: Record<string, number> = {};
-    (guestsRes.data ?? []).forEach((g: { guest_list_id: string }) => {
-      gCounts[g.guest_list_id] = (gCounts[g.guest_list_id] ?? 0) + 1;
-    });
-    setGuestCounts(gCounts);
+    const stats: Record<string, ListStats> = {};
+    ((guestsRes.data ?? []) as { guest_list_id: string; rsvp_status: RsvpStatus; companions: number }[]).forEach(
+      (g) => {
+        const s = (stats[g.guest_list_id] ??= { ...emptyStats });
+        s.total += 1;
+        s[g.rsvp_status] += 1;
+        s.companions += g.companions;
+      },
+    );
+    setStatsByList(stats);
 
-    const lCounts: Record<string, number> = {};
-    (linksRes.data ?? []).forEach((l: { guest_list_id: string }) => {
-      lCounts[l.guest_list_id] = (lCounts[l.guest_list_id] ?? 0) + 1;
+    const evIdsByList: Record<string, string[]> = {};
+    ((linksRes.data ?? []) as { event_id: string; guest_list_id: string }[]).forEach((l) => {
+      (evIdsByList[l.guest_list_id] ??= []).push(l.event_id);
     });
-    setLinkCounts(lCounts);
+    setEventIdsByList(evIdsByList);
 
     setLoading(false);
   }
@@ -64,12 +91,11 @@ function ListasConvidadosPageContent() {
       setForm(emptyForm);
       return;
     }
-    const { data } = await supabase.from("event_guest_lists").select("event_id").eq("guest_list_id", item.id);
     setForm({
       id: item.id,
       name: item.name,
       description: item.description ?? "",
-      eventIds: (data ?? []).map((r) => r.event_id as string),
+      eventIds: eventIdsByList[item.id] ?? [],
     });
   }
 
@@ -139,36 +165,41 @@ function ListasConvidadosPageContent() {
       toast.error(error.message);
       return;
     }
-    setItems((prev) => prev.filter((i) => i.id !== id));
     toast.success("Lista removida.");
+    load();
   }
 
-  return (
-    <>
-      <div className="admin-topbar">
-        <div>
-          <h1>Listas de Convidados</h1>
-          <p>Crie listas e reaproveite a mesma lista em um ou mais eventos</p>
-        </div>
-        <button className="admin-btn admin-btn-gold" onClick={() => openForm()}>
-          + Nova lista
-        </button>
-      </div>
+  const listIdsByEvent: Record<string, string[]> = {};
+  for (const list of lists) {
+    for (const eventId of eventIdsByList[list.id] ?? []) {
+      (listIdsByEvent[eventId] ??= []).push(list.id);
+    }
+  }
+  const unlinkedLists = lists.filter((l) => (eventIdsByList[l.id] ?? []).length === 0);
 
-      <div className="admin-card">
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Descrição</th>
-                <th>Convidados</th>
-                <th>Eventos vinculados</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, i) => (
+  function ListsTable({ listIds, currentEventId }: { listIds: string[]; currentEventId?: string }) {
+    const rows = lists.filter((l) => listIds.includes(l.id));
+    return (
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Convidados</th>
+              <th>Acompanhantes</th>
+              <th>Também usada em</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((item, i) => {
+              const s = statsByList[item.id] ?? emptyStats;
+              const otherEvents = (eventIdsByList[item.id] ?? [])
+                .filter((id) => id !== currentEventId)
+                .map((id) => events.find((e) => e.id === id))
+                .filter((e): e is EventRow => !!e);
+              return (
                 <motion.tr
                   key={item.id}
                   initial={{ opacity: 0, y: 8 }}
@@ -176,13 +207,27 @@ function ListasConvidadosPageContent() {
                   transition={{ duration: 0.25, delay: i * 0.03, ease: [0.16, 0.84, 0.36, 1] }}
                 >
                   <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
-                  <td style={{ maxWidth: 300 }}>{item.description || "—"}</td>
+                  <td style={{ maxWidth: 260 }}>{item.description || "—"}</td>
                   <td>
-                    <Link href={`/admin/convidados?lista=${item.id}`} className="admin-btn admin-btn-line admin-btn-sm">
-                      {guestCounts[item.id] ?? 0} convidados
+                    <Link
+                      href={`/admin/convidados?lista=${item.id}`}
+                      className="admin-btn admin-btn-line admin-btn-sm"
+                      style={{ marginRight: 8 }}
+                    >
+                      {s.total} convidados
                     </Link>
+                    {s.total > 0 && (
+                      <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                        <span className="status-badge status-confirmado">{s.confirmado} conf.</span>
+                        <span className="status-badge status-pendente">{s.pendente} pend.</span>
+                        {s.recusado > 0 && <span className="status-badge status-recusado">{s.recusado} rec.</span>}
+                      </span>
+                    )}
                   </td>
-                  <td>{linkCounts[item.id] ?? 0}</td>
+                  <td>{s.companions}</td>
+                  <td style={{ fontSize: 12.5, color: "var(--taupe-deep)" }}>
+                    {otherEvents.length > 0 ? otherEvents.map((e) => e.title).join(", ") : "—"}
+                  </td>
                   <td className="row-actions">
                     <button className="admin-btn admin-btn-line admin-btn-sm" onClick={() => openForm(item)}>
                       Editar
@@ -192,12 +237,80 @@ function ListasConvidadosPageContent() {
                     </button>
                   </td>
                 </motion.tr>
-              ))}
-            </tbody>
-          </table>
-          {!loading && items.length === 0 && <div className="empty-state">Nenhuma lista cadastrada.</div>}
-        </div>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="admin-topbar">
+        <div>
+          <h1>Listas de Convidados</h1>
+          <p>Organizadas por evento — crie uma lista e reaproveite-a em um ou mais eventos</p>
+        </div>
+        <button className="admin-btn admin-btn-gold" onClick={() => openForm()}>
+          + Nova lista
+        </button>
+      </div>
+
+      {!loading && lists.length === 0 && (
+        <div className="admin-card">
+          <div className="empty-state">Nenhuma lista cadastrada ainda.</div>
+        </div>
+      )}
+
+      {events.map((ev) => {
+        const listIds = listIdsByEvent[ev.id] ?? [];
+        const totals = listIds
+          .map((id) => statsByList[id] ?? emptyStats)
+          .reduce((acc, s) => addStats(acc, s), { ...emptyStats });
+
+        return (
+          <div className="admin-card event-guest-group" key={ev.id}>
+            <div className="event-guest-group-head">
+              <div>
+                <b>{ev.title}</b>
+                <span>
+                  {ev.event_date ? formatDate(ev.event_date) : "Sem data definida"} · {EVENT_TYPE_LABELS[ev.event_type]}
+                  {ev.guest_count ? ` · previsão de ${ev.guest_count} convidados` : ""}
+                </span>
+              </div>
+              {listIds.length > 0 && (
+                <div className="event-guest-group-totals">
+                  <span className="status-badge status-confirmado">{totals.confirmado} confirmados</span>
+                  <span className="status-badge status-pendente">{totals.pendente} pendentes</span>
+                  {totals.recusado > 0 && <span className="status-badge status-recusado">{totals.recusado} recusados</span>}
+                  <span style={{ fontSize: 12.5, color: "var(--taupe-deep)" }}>
+                    {totals.total + totals.companions} pessoas no total (com acompanhantes)
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {listIds.length === 0 ? (
+              <div className="empty-state">Nenhuma lista vinculada a este evento ainda.</div>
+            ) : (
+              <ListsTable listIds={listIds} currentEventId={ev.id} />
+            )}
+          </div>
+        );
+      })}
+
+      {unlinkedLists.length > 0 && (
+        <div className="admin-card event-guest-group">
+          <div className="event-guest-group-head">
+            <div>
+              <b>Sem evento vinculado</b>
+              <span>Listas criadas mas ainda não associadas a nenhum evento</span>
+            </div>
+          </div>
+          <ListsTable listIds={unlinkedLists.map((l) => l.id)} />
+        </div>
+      )}
 
       <Modal open={!!form} onClose={() => setForm(null)} title={form?.id ? "Editar lista" : "Nova lista"}>
         {form && (
