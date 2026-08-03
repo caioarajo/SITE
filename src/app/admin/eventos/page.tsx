@@ -134,6 +134,9 @@ function EventosPageContent() {
                     <Link href={`/admin/eventos/${item.id}/mesas`} className="admin-btn admin-btn-line admin-btn-sm">
                       Mapa de Mesas
                     </Link>
+                    <Link href={`/admin/listas-convidados?evento=${item.id}`} className="admin-btn admin-btn-line admin-btn-sm">
+                      Convidados
+                    </Link>
                     <button className="admin-btn admin-btn-line admin-btn-sm" onClick={() => setForm(item)}>
                       Editar
                     </button>

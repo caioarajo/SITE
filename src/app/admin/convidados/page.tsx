@@ -29,6 +29,7 @@ function ConvidadosPageContent() {
   const [lists, setLists] = useState<GuestListRow[]>([]);
   const [selectedList, setSelectedList] = useState<string>("");
   const [items, setItems] = useState<GuestRow[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<Partial<GuestRow> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -66,6 +67,7 @@ function ConvidadosPageContent() {
 
   useEffect(() => {
     if (selectedList) loadGuests(selectedList);
+    setSearch("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedList]);
 
@@ -73,6 +75,11 @@ function ConvidadosPageContent() {
   const pendingCount = items.filter((g) => g.rsvp_status === "pendente").length;
   const declinedCount = items.filter((g) => g.rsvp_status === "recusado").length;
   const totalCompanions = items.reduce((s, g) => s + g.companions, 0);
+
+  const term = search.trim().toLowerCase();
+  const filteredItems = term
+    ? items.filter((g) => g.name.toLowerCase().includes(term) || (g.category ?? "").toLowerCase().includes(term))
+    : items;
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -156,6 +163,10 @@ function ConvidadosPageContent() {
             <div className="value">{pendingCount}</div>
           </div>
           <div className="admin-stat-card">
+            <div className="label">Recusados</div>
+            <div className="value">{declinedCount}</div>
+          </div>
+          <div className="admin-stat-card">
             <div className="label">Acompanhantes</div>
             <div className="value">{totalCompanions}</div>
           </div>
@@ -163,6 +174,16 @@ function ConvidadosPageContent() {
       )}
 
       <div className="admin-card">
+        {selectedList && items.length > 0 && (
+          <div className="field-group" style={{ marginBottom: 18, maxWidth: 320 }}>
+            <input
+              className="field-input"
+              placeholder="Buscar por nome ou categoria..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        )}
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
@@ -176,7 +197,7 @@ function ConvidadosPageContent() {
               </tr>
             </thead>
             <tbody>
-              {items.map((item, i) => (
+              {filteredItems.map((item, i) => (
                 <motion.tr
                   key={item.id}
                   initial={{ opacity: 0, y: 8 }}
@@ -217,6 +238,9 @@ function ConvidadosPageContent() {
             <div className="empty-state">
               {selectedList ? "Nenhum convidado nesta lista ainda." : "Crie uma lista de convidados primeiro."}
             </div>
+          )}
+          {!loading && items.length > 0 && filteredItems.length === 0 && (
+            <div className="empty-state">Nenhum convidado encontrado para &ldquo;{search}&rdquo;.</div>
           )}
         </div>
       </div>

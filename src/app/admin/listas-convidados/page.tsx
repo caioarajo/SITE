@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { GuestListRow, EventRow, RsvpStatus } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -40,6 +41,8 @@ function addStats(a: ListStats, b: ListStats): ListStats {
 }
 
 function ListasConvidadosPageContent() {
+  const searchParams = useSearchParams();
+  const highlightEventId = searchParams.get("evento");
   const [lists, setLists] = useState<GuestListRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [statsByList, setStatsByList] = useState<Record<string, ListStats>>({});
@@ -85,6 +88,13 @@ function ListasConvidadosPageContent() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!highlightEventId || loading) return;
+    const el = document.getElementById(`event-guest-${highlightEventId}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightEventId, loading]);
 
   async function openForm(item?: GuestListRow) {
     if (!item) {
@@ -167,6 +177,63 @@ function ListasConvidadosPageContent() {
     }
     toast.success("Lista removida.");
     load();
+  }
+
+  function csvEscape(value: string): string {
+    return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  }
+
+  async function exportConfirmed(ev: EventRow, listIds: string[], format: "csv" | "pdf") {
+    const { data, error } = await supabase
+      .from("guests")
+      .select("name, category, companions, guest_list_id")
+      .in("guest_list_id", listIds)
+      .eq("rsvp_status", "confirmado")
+      .order("name", { ascending: true });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    const rows = (data ?? []) as { name: string; category: string | null; companions: number; guest_list_id: string }[];
+    if (rows.length === 0) {
+      toast.error("Nenhum convidado confirmado para exportar.");
+      return;
+    }
+    const listNameOf = (id: string) => lists.find((l) => l.id === id)?.name ?? "—";
+    const safeTitle = ev.title.replace(/[^\p{L}\p{N}]+/gu, "-").toLowerCase();
+
+    if (format === "csv") {
+      const header = ["Nome", "Lista", "Categoria", "Acompanhantes"];
+      const lines = [header, ...rows.map((r) => [r.name, listNameOf(r.guest_list_id), r.category ?? "", String(r.companions)])];
+      const csv = "﻿" + lines.map((line) => line.map((v) => csvEscape(v)).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `confirmados-${safeTitle}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      const { jsPDF } = await import("jspdf");
+      const autoTable = (await import("jspdf-autotable")).default;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text(`Confirmados — ${ev.title}`, 14, 18);
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      doc.text(ev.event_date ? formatDate(ev.event_date) : "Sem data definida", 14, 24);
+      const totalCompanions = rows.reduce((s, r) => s + r.companions, 0);
+      autoTable(doc, {
+        startY: 30,
+        head: [["Nome", "Lista", "Categoria", "Acompanhantes"]],
+        body: rows.map((r) => [r.name, listNameOf(r.guest_list_id), r.category ?? "—", String(r.companions)]),
+        foot: [["Total", "", `${rows.length} confirmados`, `${totalCompanions} acompanhantes`]],
+        headStyles: { fillColor: [24, 44, 82] },
+        footStyles: { fillColor: [241, 233, 220], textColor: [53, 43, 34] },
+        styles: { fontSize: 10 },
+      });
+      doc.save(`confirmados-${safeTitle}.pdf`);
+    }
   }
 
   const listIdsByEvent: Record<string, string[]> = {};
@@ -270,7 +337,11 @@ function ListasConvidadosPageContent() {
           .reduce((acc, s) => addStats(acc, s), { ...emptyStats });
 
         return (
-          <div className="admin-card event-guest-group" key={ev.id}>
+          <div
+            className={`admin-card event-guest-group${ev.id === highlightEventId ? " event-guest-group-highlight" : ""}`}
+            id={`event-guest-${ev.id}`}
+            key={ev.id}
+          >
             <div className="event-guest-group-head">
               <div>
                 <b>{ev.title}</b>
@@ -287,6 +358,24 @@ function ListasConvidadosPageContent() {
                   <span style={{ fontSize: 12.5, color: "var(--taupe-deep)" }}>
                     {totals.total + totals.companions} pessoas no total (com acompanhantes)
                   </span>
+                  {totals.confirmado > 0 && (
+                    <span style={{ display: "inline-flex", gap: 8 }}>
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-line admin-btn-sm"
+                        onClick={() => exportConfirmed(ev, listIds, "csv")}
+                      >
+                        Exportar CSV
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-line admin-btn-sm"
+                        onClick={() => exportConfirmed(ev, listIds, "pdf")}
+                      >
+                        Exportar PDF
+                      </button>
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -369,7 +458,9 @@ function ListasConvidadosPageContent() {
 export default function ListasConvidadosPage() {
   return (
     <ToastProvider>
-      <ListasConvidadosPageContent />
+      <Suspense fallback={null}>
+        <ListasConvidadosPageContent />
+      </Suspense>
     </ToastProvider>
   );
 }
