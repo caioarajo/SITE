@@ -494,6 +494,71 @@
     .inquiry-form .row{grid-template-columns:1fr;}
   }
 
+  /* ---------- Seletor de data (Data do evento) ---------- */
+  .date-field{position:relative;}
+  .date-field-trigger{
+    width:100%;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    border:1px solid var(--line);
+    background:var(--cream-alt);
+    border-radius:3px;
+    padding:12px 14px;
+    font-family:'Jost', sans-serif;
+    font-size:14.5px;
+    color:var(--espresso);
+    cursor:pointer;
+    text-align:left;
+    transition:border-color .3s;
+  }
+  .date-field-trigger.is-empty{color:var(--taupe-deep);}
+  .date-field-trigger:hover, .date-field-trigger:focus-visible{border-color:var(--gold); outline:none;}
+  .date-field-icon{width:16px; height:16px; color:var(--taupe-deep); flex:none;}
+
+  .date-popover{
+    position:absolute; top:calc(100% + 8px); left:0; z-index:40;
+    width:280px; max-width:calc(100vw - 48px);
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .date-popover-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .date-popover-head span{
+    font-family:'Playfair Display', serif; font-style:italic; font-size:14.5px;
+    color:var(--espresso); text-transform:capitalize;
+  }
+  .date-popover-head button{
+    width:26px; height:26px; border-radius:50%;
+    background:none; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; line-height:1; color:var(--espresso);
+    cursor:pointer; transition:.2s;
+  }
+  .date-popover-head button:hover{background:var(--cream-alt); border-color:var(--gold);}
+  .date-popover-weekdays{display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:4px;}
+  .date-popover-weekdays span{
+    display:block; text-align:center; font-size:10px; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--taupe-deep);
+  }
+  .date-popover-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:2px;}
+  .date-popover-day{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-family:'Jost', sans-serif; font-size:12.5px; color:var(--espresso);
+    background:none; border:none; border-radius:50%; cursor:pointer; transition:.15s;
+  }
+  .date-popover-day:hover:not(:disabled){background:var(--cream-alt);}
+  .date-popover-day.outside{color:rgba(53,43,34,0.28);}
+  .date-popover-day.today{border:1px solid var(--gold);}
+  .date-popover-day.selected{background:var(--gold); color:var(--cream);}
+  .date-popover-day:disabled{color:rgba(53,43,34,0.2); cursor:not-allowed;}
+  .date-popover-clear{
+    display:block; width:100%; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);
+    background:none; border-left:none; border-right:none; border-bottom:none;
+    text-align:center; font-size:11.5px; color:var(--taupe-deep); text-decoration:underline;
+    cursor:pointer;
+  }
+
   .hero .cred-badge{
     display:inline-flex;
     align-items:center;

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Reveal from "./Reveal";
+import DatePickerField from "./DatePickerField";
 
 interface Settings {
   phone: string;
@@ -126,7 +127,7 @@ export default function ContactSection({
               </div>
               <div className="field">
                 <label htmlFor="f-date">Data do evento</label>
-                <input id="f-date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+                <DatePickerField id="f-date" value={eventDate} onChange={setEventDate} />
               </div>
             </div>
             <div className="row">

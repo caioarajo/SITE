@@ -72,6 +72,10 @@ export default function IconSprite() {
       <symbol id="ic-close" viewBox="0 0 24 24">
         <path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" d="M5 5l14 14M19 5L5 19" />
       </symbol>
+      <symbol id="ic-calendar" viewBox="0 0 24 24">
+        <rect x="3.5" y="5" width="17" height="15.5" rx="2.2" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" d="M7.5 3v4M16.5 3v4M3.5 9.5h17" />
+      </symbol>
       <symbol id="ic-wa" viewBox="0 0 32 32">
         <path
           fill="currentColor"
