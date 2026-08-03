@@ -96,13 +96,9 @@ export default function Services({ services, whatsappNumber }: { services: Servi
 
         <Reveal className="extras-row">
           <span className="ex-label">Valores extras</span>
-          <span className="ex-item">
-            Confirmação de presença <b>R$ 300</b>
-          </span>
+          <span className="ex-item">Confirmação de presença</span>
           <span className="sep" />
-          <span className="ex-item">
-            Auxiliar extra <b>R$ 250</b>
-          </span>
+          <span className="ex-item">Auxiliar extra</span>
         </Reveal>
       </div>
     </section>
