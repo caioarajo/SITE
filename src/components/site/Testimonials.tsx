@@ -54,10 +54,14 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
 
         {featured && (
           <Reveal className="feature-quote">
-            <div className="fq-photos">
-              {featured.photo_url_1 && <img className="p1" src={featured.photo_url_1} alt={featured.couple_names} />}
-              {featured.photo_url_2 && <img className="p2" src={featured.photo_url_2} alt={featured.couple_names} />}
-            </div>
+            {featured.photo_url_1 && (
+              <div className="fq-photo">
+                <span className="fq-photo-mat" aria-hidden="true" />
+                <div className="fq-photo-frame">
+                  <img src={featured.photo_url_1} alt={featured.couple_names} />
+                </div>
+              </div>
+            )}
             <div className="fq-text">
               <span className="mark">&ldquo;</span>
               <p>{featured.quote}</p>
