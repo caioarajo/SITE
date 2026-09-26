@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import EChart from "@/components/admin/EChart";
 import type { OpportunityRow, OpportunityStage, OpportunitySource } from "@/lib/types";
-import { NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN, CATEGORY_PALETTE } from "@/lib/chartColors";
+import { NAVY, GOLD, ROSE, TAUPE, ESPRESSO, GREEN, SLATE, CATEGORY_PALETTE } from "@/lib/chartColors";
 import { formatCurrency } from "@/lib/utils";
 
 const STAGE_LABELS: Record<OpportunityStage, string> = {
@@ -19,6 +19,7 @@ const STAGE_LABELS: Record<OpportunityStage, string> = {
 const SOURCE_LABELS: Record<OpportunitySource, string> = {
   site_form: "Formulário do site",
   whatsapp: "WhatsApp",
+  instagram: "Instagram",
   manual: "Manual",
   indicacao: "Indicação",
   outro: "Outro",
@@ -68,6 +69,7 @@ export default function CrmDashboard({ opportunities }: { opportunities: Opportu
     const colors: Record<OpportunitySource, string> = {
       site_form: NAVY,
       whatsapp: GREEN,
+      instagram: SLATE,
       manual: GOLD,
       indicacao: ROSE,
       outro: TAUPE,
