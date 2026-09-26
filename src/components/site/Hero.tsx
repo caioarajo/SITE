@@ -170,7 +170,7 @@ export default function Hero({ heroPhotoSrc, whatsappNumber }: { heroPhotoSrc: s
               <span>Anos de experiência</span>
             </div>
             <div>
-              <b>6</b>
+              <b>5</b>
               <span>Nichos de eventos atendidos</span>
             </div>
             <div>

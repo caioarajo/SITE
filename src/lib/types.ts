@@ -23,7 +23,6 @@ export type TableShape = "round" | "rectangle";
 export type PortfolioCategory =
   | "quinze_anos"
   | "casamentos"
-  | "formaturas"
   | "empresarial"
   | "infantil"
   | "eventos_gerais";

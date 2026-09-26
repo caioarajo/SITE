@@ -6,7 +6,6 @@ import type { PortfolioCategory } from "@/lib/types";
 export const PORTFOLIO_CATEGORIES: { value: PortfolioCategory; label: string }[] = [
   { value: "quinze_anos", label: "15 Anos" },
   { value: "casamentos", label: "Casamentos" },
-  { value: "formaturas", label: "Formaturas" },
   { value: "empresarial", label: "Empresarial" },
   { value: "infantil", label: "Infantil" },
   { value: "eventos_gerais", label: "Eventos em Geral" },

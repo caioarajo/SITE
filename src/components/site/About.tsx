@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { MouseEvent } from "react";
 import Reveal from "./Reveal";
 
-const NICHES = ["15 anos", "Casamentos", "Formaturas", "Empresarial", "Infantil", "Eventos em geral"];
+const NICHES = ["15 anos", "Casamentos", "Empresarial", "Infantil", "Eventos em geral"];
 
 export default function About({ liaPortraitSrc }: { liaPortraitSrc: string }) {
   // Mesmo efeito de parallax sutil do retrato do hero: a foto acompanha o
