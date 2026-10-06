@@ -22,12 +22,18 @@ function readAlbumFromUrl(): PortfolioCategory | null {
 /** Miniatura de um item: foto ou poster do vídeo, ambos via next/image
  * (WebP/AVIF + srcset automáticos). Vídeos sem poster (enviados antes
  * dessa função existir) caem para a prévia em <video>. */
+// Corte do mosaico tende a ser mais largo/baixo que a foto original, o que
+// corta a cabeça das pessoas num crop central puro. Inclina o foco pra cima
+// por padrão — ajuda na maioria das fotos (pessoas em pé, retrato vertical)
+// sem precisar de detecção de rosto.
+const DEFAULT_OBJECT_POSITION = "center 20%";
+
 function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string; alt: string }) {
   if (item.media_type === "video") {
     if (item.poster_url) {
       return (
         <>
-          <Image src={item.poster_url} alt={alt} fill sizes={sizes} style={{ objectFit: "cover" }} />
+          <Image src={item.poster_url} alt={alt} fill sizes={sizes} style={{ objectFit: "cover", objectPosition: DEFAULT_OBJECT_POSITION }} />
           <span className="video-play-badge">
             <svg>
               <use href="#ic-play" />
@@ -36,9 +42,18 @@ function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string
         </>
       );
     }
-    return <video src={item.url} muted playsInline preload="metadata" />;
+    return <video src={item.url} muted playsInline preload="metadata" style={{ objectPosition: DEFAULT_OBJECT_POSITION }} />;
   }
-  return <Image src={item.url} alt={alt} fill sizes={sizes} loading="lazy" style={{ objectFit: "cover" }} />;
+  return (
+    <Image
+      src={item.url}
+      alt={alt}
+      fill
+      sizes={sizes}
+      loading="lazy"
+      style={{ objectFit: "cover", objectPosition: DEFAULT_OBJECT_POSITION }}
+    />
+  );
 }
 
 export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
