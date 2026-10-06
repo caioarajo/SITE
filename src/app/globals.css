@@ -986,8 +986,6 @@
   .segment-thumb .video-play-badge{ width:38px; height:38px; }
   .segment-thumb .video-play-badge svg{ width:15px; height:15px; }
 
-  .gallery-sentinel{ height:1px; }
-
   .gi-1{grid-column:span 2; grid-row:span 2;}
   .gi-2{grid-column:span 2; grid-row:span 1;}
   .gi-3{grid-column:span 1; grid-row:span 1;}
@@ -1478,6 +1476,14 @@
 .media-item{
   position:relative; border-radius:6px; overflow:hidden; background:var(--cream-alt);
   aspect-ratio:4/3; box-shadow:0 10px 25px -18px rgba(0,0,0,.4);
+  transition:transform .18s, box-shadow .18s, outline-color .18s;
+}
+.media-item[draggable="true"]{ cursor:grab; }
+.media-item.dragging-item{ opacity:.4 !important; cursor:grabbing; }
+.media-item.drag-over{
+  outline:3px solid var(--gold); outline-offset:-3px;
+  transform:scale(0.97);
+  box-shadow:0 14px 30px -14px rgba(171,127,63,.6);
 }
 .media-item img, .media-item video{ width:100%; height:100%; object-fit:cover; }
 .media-item .media-overlay{

@@ -27,6 +27,8 @@ export default function PortfolioAdminPage() {
   const [editing, setEditing] = useState<PortfolioItemRow | null>(null);
   const [uploadCategory, setUploadCategory] = useState<PortfolioCategory>("casamentos");
   const [filter, setFilter] = useState<PortfolioCategory | "todos">("todos");
+  const [dragItemId, setDragItemId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -153,6 +155,36 @@ export default function PortfolioAdminPage() {
     await supabase.from("portfolio_items").update({ is_cover: true }).eq("id", item.id);
   }
 
+  /** Reordena por arrastar: move o item "draggedId" para a posição do item
+   * "targetId" dentro da mesma categoria, e reatribui display_order
+   * sequencial (0, 1, 2...) para todos os itens dessa categoria. Só faz
+   * sentido dentro de um único álbum por vez — display_order é contado por
+   * categoria (ver uploadFiles), então misturar categorias não teria um
+   * "lugar" consistente para soltar o item. */
+  async function reorderItem(draggedId: string, targetId: string) {
+    if (draggedId === targetId) return;
+    const category = items.find((i) => i.id === draggedId)?.category;
+    if (!category) return;
+
+    const catItems = items.filter((i) => i.category === category).sort((a, b) => a.display_order - b.display_order);
+    const fromIndex = catItems.findIndex((i) => i.id === draggedId);
+    const toIndex = catItems.findIndex((i) => i.id === targetId);
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const reordered = [...catItems];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    const withNewOrder = reordered.map((item, idx) => ({ ...item, display_order: idx }));
+    const byId = new Map(withNewOrder.map((item) => [item.id, item]));
+
+    setItems((prev) => prev.map((i) => byId.get(i.id) ?? i));
+
+    await Promise.all(
+      withNewOrder.map((item) => supabase.from("portfolio_items").update({ display_order: item.display_order }).eq("id", item.id))
+    );
+  }
+
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editing) return;
@@ -231,6 +263,16 @@ export default function PortfolioAdminPage() {
         ))}
       </div>
 
+      {filter === "todos" ? (
+        <p style={{ fontSize: 12.5, color: "var(--taupe-deep)", marginBottom: 14 }}>
+          Selecione um álbum específico acima para reordenar as fotos arrastando.
+        </p>
+      ) : (
+        <p style={{ fontSize: 12.5, color: "var(--taupe-deep)", marginBottom: 14 }}>
+          Arraste uma foto e solte sobre outra para mudar a posição dela no álbum.
+        </p>
+      )}
+
       {loading ? (
         <div className="empty-state">Carregando...</div>
       ) : visibleItems.length === 0 ? (
@@ -238,7 +280,29 @@ export default function PortfolioAdminPage() {
       ) : (
         <div className="media-grid">
           {visibleItems.map((item) => (
-            <div className="media-item" key={item.id} style={{ opacity: item.is_published ? 1 : 0.45 }}>
+            <div
+              className={`media-item${dragOverId === item.id && dragItemId && dragItemId !== item.id ? " drag-over" : ""}${dragItemId === item.id ? " dragging-item" : ""}`}
+              key={item.id}
+              style={{ opacity: item.is_published ? 1 : 0.45 }}
+              draggable={filter !== "todos"}
+              onDragStart={() => setDragItemId(item.id)}
+              onDragEnd={() => {
+                setDragItemId(null);
+                setDragOverId(null);
+              }}
+              onDragOver={(e) => {
+                if (filter === "todos") return;
+                e.preventDefault();
+                if (dragOverId !== item.id) setDragOverId(item.id);
+              }}
+              onDragLeave={() => setDragOverId((id) => (id === item.id ? null : id))}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragItemId) reorderItem(dragItemId, item.id);
+                setDragItemId(null);
+                setDragOverId(null);
+              }}
+            >
               {item.media_type === "video" ? (
                 <video src={item.url} poster={item.poster_url ?? undefined} muted />
               ) : (

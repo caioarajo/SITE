@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import type { PortfolioItemRow, PortfolioCategory } from "@/lib/types";
@@ -12,7 +12,6 @@ import Reveal from "./Reveal";
 const GRID_SPANS = ["gi-1", "gi-2", "gi-3", "gi-4", "gi-5", "gi-6", "gi-7"];
 const SEGMENT_SIZES = "(max-width: 560px) 100vw, (max-width: 940px) 50vw, 33vw";
 const GALLERY_SIZES = "(max-width: 940px) 50vw, 25vw";
-const PAGE_SIZE = 16;
 
 function readAlbumFromUrl(): PortfolioCategory | null {
   if (typeof window === "undefined") return null;
@@ -45,8 +44,6 @@ function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string
 export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
   const [category, setCategory] = useState<PortfolioCategory | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Permite abrir um álbum direto por link (?album=casamentos), sem
   // depender de useSearchParams (evita boundary de Suspense aqui).
@@ -67,7 +64,6 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
   function openAlbum(cat: PortfolioCategory) {
     setCategory(cat);
     setActiveIndex(null);
-    setVisibleCount(PAGE_SIZE);
     const url = new URL(window.location.href);
     url.searchParams.set("album", cat);
     window.history.pushState({}, "", url);
@@ -82,26 +78,7 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
   }
 
   const albumItems = category ? (grouped.get(category) ?? []) : [];
-  const shownItems = albumItems.slice(0, visibleCount);
   const active = activeIndex !== null ? albumItems[activeIndex] : null;
-
-  // Carregamento progressivo: revela mais itens conforme o visitante
-  // se aproxima do fim do álbum, em vez de montar tudo de uma vez.
-  useEffect(() => {
-    if (!category) return;
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((v) => Math.min(v + PAGE_SIZE, albumItems.length));
-        }
-      },
-      { rootMargin: "400px" }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [category, albumItems.length]);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -204,7 +181,7 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
               </div>
 
               <div className="gallery">
-                {shownItems.map((item, i) => (
+                {albumItems.map((item, i) => (
                   <div
                     key={item.id}
                     className={`gitem ${GRID_SPANS[i % GRID_SPANS.length]}`}
@@ -225,8 +202,6 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
                   <div className="empty-state">Nenhum registro publicado neste álbum ainda.</div>
                 )}
               </div>
-
-              {visibleCount < albumItems.length && <div ref={sentinelRef} className="gallery-sentinel" />}
             </motion.div>
           )}
         </AnimatePresence>
