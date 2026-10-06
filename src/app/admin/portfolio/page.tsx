@@ -29,6 +29,7 @@ export default function PortfolioAdminPage() {
   const [filter, setFilter] = useState<PortfolioCategory | "todos">("todos");
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [generatingPoster, setGeneratingPoster] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -214,6 +215,33 @@ export default function PortfolioAdminPage() {
     setEditing({ ...editing, focal_x: Math.min(100, Math.max(0, x)), focal_y: Math.min(100, Math.max(0, y)) });
   }
 
+  /** Vídeos enviados antes da captura automática de poster existir não têm
+   * imagem nenhuma pra marcar o ponto focal — gera uma agora, a partir do
+   * próprio vídeo já publicado, com a mesma técnica usada no upload. */
+  async function generatePoster() {
+    if (!editing || editing.media_type !== "video") return;
+    setGeneratingPoster(true);
+    const blob = await captureVideoFrame(editing.url);
+    if (!blob) {
+      setGeneratingPoster(false);
+      alert("Não consegui capturar um frame desse vídeo. Tente novamente ou envie o vídeo de novo.");
+      return;
+    }
+    const posterPath = `uploads/posters/${crypto.randomUUID()}.jpg`;
+    const { error: posterError } = await supabase.storage
+      .from("portfolio")
+      .upload(posterPath, blob, { cacheControl: "3600", contentType: "image/jpeg" });
+    setGeneratingPoster(false);
+    if (posterError) {
+      alert(`Erro ao salvar a capa: ${posterError.message}`);
+      return;
+    }
+    const posterUrl = supabase.storage.from("portfolio").getPublicUrl(posterPath).data.publicUrl;
+    await supabase.from("portfolio_items").update({ poster_url: posterUrl }).eq("id", editing.id);
+    setEditing({ ...editing, poster_url: posterUrl });
+    setItems((prev) => prev.map((i) => (i.id === editing.id ? { ...i, poster_url: posterUrl } : i)));
+  }
+
   return (
     <>
       <div className="admin-topbar">
@@ -370,7 +398,23 @@ export default function PortfolioAdminPage() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Editar item do portfólio">
         {editing && (
           <form onSubmit={saveEdit}>
-            {(editing.media_type === "image" || editing.poster_url) && (
+            {editing.media_type === "video" && !editing.poster_url ? (
+              <div className="field-group">
+                <label className="field-label">Ponto focal</label>
+                <p style={{ fontSize: 12.5, color: "var(--taupe-deep)", marginBottom: 10 }}>
+                  Este vídeo foi enviado antes de existir captura automática de capa, então não há
+                  imagem para marcar o ponto focal ainda.
+                </p>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-line admin-btn-sm"
+                  onClick={generatePoster}
+                  disabled={generatingPoster}
+                >
+                  {generatingPoster ? "Gerando capa..." : "Gerar capa a partir do vídeo"}
+                </button>
+              </div>
+            ) : (
               <div className="field-group">
                 <label className="field-label">
                   Ponto focal (clique no rosto — garante que a miniatura não corte a cabeça)

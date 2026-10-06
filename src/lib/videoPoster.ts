@@ -1,25 +1,31 @@
 // Gera uma imagem de capa (poster) para um vídeo direto no navegador,
-// sem depender de nenhum serviço externo: carrega o arquivo num <video>
-// oculto, avança até um frame representativo e captura via <canvas>.
+// sem depender de nenhum serviço externo: carrega o arquivo (ou uma URL já
+// publicada, para vídeos antigos sem poster) num <video> oculto, avança até
+// um frame representativo e captura via <canvas>.
 // Usado no upload do portfólio para que a miniatura de um vídeo seja uma
 // imagem leve, em vez do navegador ter que baixar o vídeo inteiro só
 // para mostrar uma prévia estática.
 const MAX_POSTER_WIDTH = 900;
 
-export function captureVideoFrame(file: File): Promise<Blob | null> {
+export function captureVideoFrame(source: File | string): Promise<Blob | null> {
   return new Promise((resolve) => {
-    const url = URL.createObjectURL(file);
+    const isFile = typeof source !== "string";
+    const url = isFile ? URL.createObjectURL(source) : source;
     const video = document.createElement("video");
     video.muted = true;
     video.playsInline = true;
     video.preload = "auto";
+    // Vídeos remotos (storage do Supabase) precisam disso pro navegador
+    // não "sujar" o canvas ao desenhar o frame — o bucket público já manda
+    // os cabeçalhos CORS necessários.
+    if (!isFile) video.crossOrigin = "anonymous";
     video.src = url;
 
     let settled = false;
     function finish(blob: Blob | null) {
       if (settled) return;
       settled = true;
-      URL.revokeObjectURL(url);
+      if (isFile) URL.revokeObjectURL(url);
       video.remove();
       resolve(blob);
     }
