@@ -31,6 +31,34 @@ export async function requireAdmin() {
   return { user, serviceClient } as const;
 }
 
+/** Igual ao requireAdmin, mas também libera "usuario_avancado" — mesmo nível
+ * de permissão que as tabelas de negócio (portfolio_items etc.) já dão via
+ * RLS para quem usa o client autenticado normal, em vez do service role. */
+export async function requireStaff() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: NextResponse.json({ error: "Não autenticado." }, { status: 401 }) } as const;
+  }
+
+  const serviceClient = createServiceRoleClient();
+  const { data: profile } = await serviceClient
+    .from("profiles")
+    .select("role, is_active")
+    .eq("id", user.id)
+    .single();
+
+  const role = profile?.role as UserRole | undefined;
+  if (!profile || !profile.is_active || (role !== "admin" && role !== "usuario_avancado")) {
+    return { error: NextResponse.json({ error: "Sem permissão." }, { status: 403 }) } as const;
+  }
+
+  return { user, serviceClient } as const;
+}
+
 /** Igual ao acima, mas só exige que o usuário esteja logado e ativo — usada
  * pela rota que o próprio usuário chama para limpar seu must_change_password. */
 export async function requireActiveUser() {
