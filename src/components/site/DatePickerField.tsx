@@ -24,10 +24,12 @@ export default function DatePickerField({
   id,
   value,
   onChange,
+  isDayDisabled,
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
+  isDayDisabled?: (day: Date) => boolean;
 }) {
   const [open, setOpen] = useState(false);
   const selected = value ? parseISO(value) : null;
@@ -101,7 +103,7 @@ export default function DatePickerField({
           </div>
           <div className="date-popover-grid">
             {days.map((day) => {
-              const disabled = isBefore(day, today);
+              const disabled = isBefore(day, today) || (isDayDisabled?.(day) ?? false);
               const outside = !isSameMonth(day, viewMonth);
               const isSelected = selected && isSameDay(day, selected);
               const isToday = isSameDay(day, today);

@@ -1825,3 +1825,25 @@
 }
 .bio-back:hover{ color:#e7b878; }
 
+
+/* ---------- Agendamento de reunião (BookingSection) ---------- */
+.booking{ background:var(--cream-alt); }
+.booking-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:36px; margin-top:8px; align-items:start;
+}
+.booking-step .field-label{ display:block; margin-bottom:10px; }
+.booking-picked, .booking-hint{ margin-top:10px; font-size:13px; color:var(--taupe-deep); }
+.booking-slots{ display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:10px; }
+.booking-slot{
+  padding:11px 8px; border:1px solid var(--line); background:var(--cream); color:var(--espresso);
+  border-radius:3px; font-family:'Jost',sans-serif; font-size:14px; cursor:pointer; transition:.2s;
+}
+.booking-slot:hover{ border-color:var(--gold); }
+.booking-slot.selected{ background:var(--gold); border-color:var(--gold); color:var(--cream); }
+.booking-form{ margin-top:30px; }
+.booking-done{ text-align:center; padding:40px 20px; background:var(--cream); border-radius:6px; border:1px solid var(--line); }
+.booking-done h2{ font-size:28px; font-style:italic; margin-bottom:12px; }
+.booking-done p{ color:var(--text-soft, #5b4f42); }
+.booking-error{ margin-top:14px; color:#b3311c; text-align:center; }
+.hp-field{ position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+@media (max-width:760px){ .booking-grid{ grid-template-columns:1fr; } }

@@ -7,6 +7,7 @@ import Services from "@/components/site/Services";
 import Portfolio from "@/components/site/Portfolio";
 import Testimonials from "@/components/site/Testimonials";
 import Faq from "@/components/site/Faq";
+import BookingSection from "@/components/site/BookingSection";
 import ContactSection from "@/components/site/ContactSection";
 import Footer from "@/components/site/Footer";
 import WhatsAppFloat from "@/components/site/WhatsAppFloat";
@@ -39,6 +40,7 @@ export default async function HomePage() {
         <Portfolio items={portfolioItems} />
         <Testimonials testimonials={testimonials} />
         <Faq faqs={faqs} />
+        <BookingSection />
         <ContactSection
           liaPhotoSrc="/images/lia-contact.jpg"
           settings={{
