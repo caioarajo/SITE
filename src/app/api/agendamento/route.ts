@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createCalendarEvent, googleConfigured } from "@/lib/googleCalendar";
 import {
   BOOKING_EVENT_TYPES,
   SLOT_MINUTES,
@@ -128,6 +129,20 @@ export async function POST(request: NextRequest) {
   });
   if (agendaError) {
     return NextResponse.json({ error: "Não foi possível reservar o horário." }, { status: 500 });
+  }
+
+  // Best-effort: se o Google falhar, a reserva continua valendo no admin.
+  if (googleConfigured()) {
+    try {
+      await createCalendarEvent({
+        summary: `Reunião de apresentação — ${name}`,
+        description: `Tipo de evento: ${eventType}\nTelefone: ${phone}${email ? `\nE-mail: ${email}` : ""}${message ? `\n\n${message}` : ""}`,
+        start,
+        end,
+      });
+    } catch (err) {
+      console.error("[agendamento] Google Agenda:", err instanceof Error ? err.message : err);
+    }
   }
 
   return NextResponse.json({ ok: true, date, time }, { status: 201 });
