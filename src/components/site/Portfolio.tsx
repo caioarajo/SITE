@@ -29,11 +29,17 @@ function readAlbumFromUrl(): PortfolioCategory | null {
 const DEFAULT_OBJECT_POSITION = "center 20%";
 
 function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string; alt: string }) {
+  // Ponto focal marcado manualmente no admin tem prioridade sobre a
+  // estimativa padrão — garante o enquadramento certo nas fotos em que o
+  // ajuste automático não acerta.
+  const objectPosition =
+    item.focal_x != null && item.focal_y != null ? `${item.focal_x}% ${item.focal_y}%` : DEFAULT_OBJECT_POSITION;
+
   if (item.media_type === "video") {
     if (item.poster_url) {
       return (
         <>
-          <Image src={item.poster_url} alt={alt} fill sizes={sizes} style={{ objectFit: "cover", objectPosition: DEFAULT_OBJECT_POSITION }} />
+          <Image src={item.poster_url} alt={alt} fill sizes={sizes} style={{ objectFit: "cover", objectPosition }} />
           <span className="video-play-badge">
             <svg>
               <use href="#ic-play" />
@@ -42,7 +48,7 @@ function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string
         </>
       );
     }
-    return <video src={item.url} muted playsInline preload="metadata" style={{ objectPosition: DEFAULT_OBJECT_POSITION }} />;
+    return <video src={item.url} muted playsInline preload="metadata" style={{ objectPosition }} />;
   }
   return (
     <Image
@@ -51,7 +57,7 @@ function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string
       fill
       sizes={sizes}
       loading="lazy"
-      style={{ objectFit: "cover", objectPosition: DEFAULT_OBJECT_POSITION }}
+      style={{ objectFit: "cover", objectPosition }}
     />
   );
 }

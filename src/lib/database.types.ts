@@ -841,6 +841,8 @@ export type Database = {
           category: string
           created_at: string
           display_order: number
+          focal_x: number | null
+          focal_y: number | null
           id: string
           is_cover: boolean
           is_published: boolean
@@ -855,6 +857,8 @@ export type Database = {
           category?: string
           created_at?: string
           display_order?: number
+          focal_x?: number | null
+          focal_y?: number | null
           id?: string
           is_cover?: boolean
           is_published?: boolean
@@ -869,6 +873,8 @@ export type Database = {
           category?: string
           created_at?: string
           display_order?: number
+          focal_x?: number | null
+          focal_y?: number | null
           id?: string
           is_cover?: boolean
           is_published?: boolean

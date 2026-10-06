@@ -190,10 +190,28 @@ export default function PortfolioAdminPage() {
     if (!editing) return;
     await supabase
       .from("portfolio_items")
-      .update({ title: editing.title, caption: editing.caption, category: editing.category })
+      .update({
+        title: editing.title,
+        caption: editing.caption,
+        category: editing.category,
+        focal_x: editing.focal_x,
+        focal_y: editing.focal_y,
+      })
       .eq("id", editing.id);
     setItems((prev) => prev.map((i) => (i.id === editing.id ? editing : i)));
     setEditing(null);
+  }
+
+  /** Clique na prévia da foto (dentro do modal de edição) define o ponto
+   * focal como % da posição clicada na imagem — usado como object-position
+   * no corte "cover" das miniaturas, pra garantir que o rosto não seja
+   * cortado mesmo quando o ajuste automático não acertar. */
+  function pickFocalPoint(e: React.MouseEvent<HTMLImageElement>) {
+    if (!editing) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10;
+    const y = Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10;
+    setEditing({ ...editing, focal_x: Math.min(100, Math.max(0, x)), focal_y: Math.min(100, Math.max(0, y)) });
   }
 
   return (
@@ -352,6 +370,34 @@ export default function PortfolioAdminPage() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Editar item do portfólio">
         {editing && (
           <form onSubmit={saveEdit}>
+            {(editing.media_type === "image" || editing.poster_url) && (
+              <div className="field-group">
+                <label className="field-label">
+                  Ponto focal (clique no rosto — garante que a miniatura não corte a cabeça)
+                </label>
+                <div className="focal-picker">
+                  <img
+                    src={editing.media_type === "video" ? editing.poster_url! : editing.url}
+                    alt=""
+                    onClick={pickFocalPoint}
+                  />
+                  <span
+                    className="focal-marker"
+                    style={{ left: `${editing.focal_x ?? 50}%`, top: `${editing.focal_y ?? 20}%` }}
+                  />
+                </div>
+                {(editing.focal_x !== null || editing.focal_y !== null) && (
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-line admin-btn-sm"
+                    style={{ marginTop: 8 }}
+                    onClick={() => setEditing({ ...editing, focal_x: null, focal_y: null })}
+                  >
+                    Redefinir para o padrão
+                  </button>
+                )}
+              </div>
+            )}
             <div className="field-group">
               <label className="field-label">Álbum</label>
               <select
