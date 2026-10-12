@@ -48,7 +48,9 @@ export default async function HomePage() {
         <Testimonials testimonials={testimonials} />
         <Faq faqs={faqs} />
         <ContactSection
-          liaPhotoSrc="/images/lia-contact.jpg"
+          liaPhotoSrc={settings.contact_photo_url}
+          liaPhotoFocalX={settings.contact_photo_focal_x ? Number(settings.contact_photo_focal_x) : null}
+          liaPhotoFocalY={settings.contact_photo_focal_y ? Number(settings.contact_photo_focal_y) : null}
           settings={{
             phone: settings.phone,
             email: settings.email,

@@ -91,6 +91,9 @@ export async function getSiteSettings(): Promise<Record<string, string>> {
     whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5592992662890",
     email: "liapontesa@gmail.com",
     instagram: "@lpcerimonial_",
+    contact_photo_url: "/images/lia-contact.jpg",
+    contact_photo_focal_x: "",
+    contact_photo_focal_y: "",
   };
 
   if (error || !data) {

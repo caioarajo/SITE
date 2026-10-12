@@ -14,11 +14,20 @@ interface Settings {
 
 export default function ContactSection({
   liaPhotoSrc,
+  liaPhotoFocalX,
+  liaPhotoFocalY,
   settings,
 }: {
   liaPhotoSrc: string;
+  liaPhotoFocalX?: number | null;
+  liaPhotoFocalY?: number | null;
   settings: Settings;
 }) {
+  // Sem ponto focal definido no admin, usa o mesmo padrão (centro, um
+  // pouco para cima) das outras fotos do site.
+  const photoObjectPosition =
+    liaPhotoFocalX != null && liaPhotoFocalY != null ? `${liaPhotoFocalX}% ${liaPhotoFocalY}%` : "center 20%";
+
   const [name, setName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventType, setEventType] = useState("Casamento");
@@ -64,7 +73,11 @@ export default function ContactSection({
         <div className="contact-photo-outer">
           <span className="contact-photo-mat" aria-hidden="true" />
           <div className="contact-photo">
-            <img src={liaPhotoSrc} alt="Lia Pontes, cerimonialista e assessora de eventos, segurando um tablet" />
+            <img
+              src={liaPhotoSrc}
+              alt="Lia Pontes, cerimonialista e assessora de eventos"
+              style={{ objectPosition: photoObjectPosition }}
+            />
           </div>
         </div>
         <div className="contact-body">
