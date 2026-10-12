@@ -42,7 +42,19 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
               </span>
               <p>&ldquo;{t.quote}&rdquo;</p>
               <div className="who">
-                <span className="dot">{t.couple_names.charAt(0)}</span>
+                {t.photo_url_1 ? (
+                  <img
+                    className="avatar-photo"
+                    src={t.photo_url_1}
+                    alt=""
+                    style={{
+                      objectPosition:
+                        t.focal_x != null && t.focal_y != null ? `${t.focal_x}% ${t.focal_y}%` : "center 20%",
+                    }}
+                  />
+                ) : (
+                  <span className="dot">{t.couple_names.charAt(0)}</span>
+                )}
                 <div>
                   <b>{t.couple_names}</b>
                   <span>Noiva</span>

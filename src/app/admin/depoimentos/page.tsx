@@ -16,12 +16,16 @@ const emptyForm: Partial<TestimonialRow> = {
   is_published: true,
 };
 
+const MAX_QUOTE_LENGTH = 400;
+
 export default function TestimonialsAdminPage() {
   const [items, setItems] = useState<TestimonialRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<Partial<TestimonialRow> | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [dragItemId, setDragItemId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -83,6 +87,29 @@ export default function TestimonialsAdminPage() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
+  /** Reordena por arrastar: move o depoimento "draggedId" para a posição
+   * do depoimento "targetId" e reatribui display_order sequencial (0,
+   * 1, 2...) pra lista toda — mesma ideia do reordenar do Portfólio. */
+  async function reorderItem(draggedId: string, targetId: string) {
+    if (draggedId === targetId) return;
+    const sorted = [...items].sort((a, b) => a.display_order - b.display_order);
+    const fromIndex = sorted.findIndex((i) => i.id === draggedId);
+    const toIndex = sorted.findIndex((i) => i.id === targetId);
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const reordered = [...sorted];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    const withNewOrder = reordered.map((item, idx) => ({ ...item, display_order: idx }));
+    const byId = new Map(withNewOrder.map((item) => [item.id, item]));
+    setItems((prev) => prev.map((i) => byId.get(i.id) ?? i));
+
+    await Promise.all(
+      withNewOrder.map((item) => supabase.from("testimonials").update({ display_order: item.display_order }).eq("id", item.id))
+    );
+  }
+
   return (
     <>
       <div className="admin-topbar">
@@ -94,6 +121,10 @@ export default function TestimonialsAdminPage() {
           + Novo depoimento
         </button>
       </div>
+
+      <p style={{ fontSize: 12.5, color: "var(--taupe-deep)", marginBottom: 14 }}>
+        Arraste uma linha e solte sobre outra para mudar a ordem de exibição dos depoimentos.
+      </p>
 
       <div className="admin-card">
         <div className="admin-table-wrap">
@@ -110,7 +141,27 @@ export default function TestimonialsAdminPage() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id}>
+                <tr
+                  key={item.id}
+                  className={`${dragOverId === item.id && dragItemId && dragItemId !== item.id ? "drag-over" : ""}${dragItemId === item.id ? " dragging-item" : ""}`}
+                  draggable
+                  onDragStart={() => setDragItemId(item.id)}
+                  onDragEnd={() => {
+                    setDragItemId(null);
+                    setDragOverId(null);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (dragOverId !== item.id) setDragOverId(item.id);
+                  }}
+                  onDragLeave={() => setDragOverId((id) => (id === item.id ? null : id))}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (dragItemId) reorderItem(dragItemId, item.id);
+                    setDragItemId(null);
+                    setDragOverId(null);
+                  }}
+                >
                   <td>
                     {item.photo_url_1 ? (
                       <img
@@ -173,9 +224,21 @@ export default function TestimonialsAdminPage() {
               <textarea
                 className="field-textarea"
                 required
+                maxLength={MAX_QUOTE_LENGTH}
                 value={form.quote}
                 onChange={(e) => setForm({ ...form, quote: e.target.value })}
               />
+              <p
+                style={{
+                  fontSize: 11.5,
+                  marginTop: 4,
+                  textAlign: "right",
+                  color:
+                    (form.quote?.length ?? 0) >= MAX_QUOTE_LENGTH ? "#b3311c" : "var(--taupe-deep)",
+                }}
+              >
+                {form.quote?.length ?? 0} / {MAX_QUOTE_LENGTH}
+              </p>
             </div>
 
             <div className="field-group">

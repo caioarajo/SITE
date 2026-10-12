@@ -1063,7 +1063,8 @@
   .quote-card .spark{width:20px; height:20px; color:#e7b878;}
   .quote-card p{margin-top:16px; font-size:14.5px; color:rgba(250,246,239,0.88); font-weight:300;}
   .quote-card .who{margin-top:22px; display:flex; align-items:center; gap:10px;}
-  .quote-card .who .dot{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#e7b878,#ab7f3f); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-style:italic; color:var(--navy-deep); font-size:14px;}
+  .quote-card .who .dot{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#e7b878,#ab7f3f); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-style:italic; color:var(--navy-deep); font-size:14px; flex:none;}
+  .quote-card .who .avatar-photo{width:34px; height:34px; border-radius:50%; object-fit:cover; flex:none;}
   .quote-card .who b{font-size:13.5px; font-weight:500; display:block;}
   .quote-card .who span{font-size:11px; color:rgba(250,246,239,0.55);}
 
@@ -1382,6 +1383,9 @@
 .admin-table td{ padding:13px 14px; border-bottom:1px solid var(--line); vertical-align:middle; color:var(--espresso); }
 .admin-table tr:last-child td{ border-bottom:none; }
 .admin-table tr:hover td{ background:var(--cream-alt); }
+.admin-table tr[draggable]{ cursor:grab; }
+.admin-table tr.dragging-item{ opacity:.4; }
+.admin-table tr.drag-over td{ box-shadow:inset 0 2px 0 var(--gold), inset 0 -2px 0 var(--gold); }
 .admin-table .row-actions{ display:flex; gap:8px; }
 
 .status-badge{
