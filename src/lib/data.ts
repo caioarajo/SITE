@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ServiceRow, PortfolioItemRow, TestimonialRow, FaqRow } from "@/lib/types";
+import type { ServiceRow, PortfolioItemRow, PortfolioCategoryRow, TestimonialRow, FaqRow } from "@/lib/types";
 
 /**
  * Funções usadas pela home (Server Component) para buscar o conteúdo do
@@ -36,6 +36,20 @@ export async function getPortfolioItems(): Promise<PortfolioItemRow[]> {
     return [];
   }
   return (data as PortfolioItemRow[] | null) ?? [];
+}
+
+export async function getPortfolioCategories(): Promise<PortfolioCategoryRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("portfolio_categories")
+    .select("*")
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("[getPortfolioCategories]", error.message);
+    return [];
+  }
+  return (data as PortfolioCategoryRow[] | null) ?? [];
 }
 
 export async function getTestimonials(): Promise<TestimonialRow[]> {

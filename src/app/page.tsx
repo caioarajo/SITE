@@ -10,7 +10,14 @@ import Faq from "@/components/site/Faq";
 import ContactSection from "@/components/site/ContactSection";
 import Footer from "@/components/site/Footer";
 import WhatsAppFloat from "@/components/site/WhatsAppFloat";
-import { getServices, getPortfolioItems, getTestimonials, getFaqs, getSiteSettings } from "@/lib/data";
+import {
+  getServices,
+  getPortfolioItems,
+  getPortfolioCategories,
+  getTestimonials,
+  getFaqs,
+  getSiteSettings,
+} from "@/lib/data";
 
 // Revalida o conteúdo a cada 60s — assim, quando a Lia edita algo no
 // admin, a mudança aparece no site público em no máximo um minuto,
@@ -18,9 +25,10 @@ import { getServices, getPortfolioItems, getTestimonials, getFaqs, getSiteSettin
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [services, portfolioItems, testimonials, faqs, settings] = await Promise.all([
+  const [services, portfolioItems, portfolioCategories, testimonials, faqs, settings] = await Promise.all([
     getServices(),
     getPortfolioItems(),
+    getPortfolioCategories(),
     getTestimonials(),
     getFaqs(),
     getSiteSettings(),
@@ -36,7 +44,7 @@ export default async function HomePage() {
         <About liaPortraitSrc="/images/lia-portrait.jpg" />
         <Process />
         <Services services={services} whatsappNumber={settings.whatsapp} />
-        <Portfolio items={portfolioItems} />
+        <Portfolio items={portfolioItems} categories={portfolioCategories} />
         <Testimonials testimonials={testimonials} />
         <Faq faqs={faqs} />
         <ContactSection

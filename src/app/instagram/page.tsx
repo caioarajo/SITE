@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import IconSprite from "@/components/site/IconSprite";
 import InstagramBio from "@/components/site/InstagramBio";
-import { getSiteSettings } from "@/lib/data";
+import { getSiteSettings, getPortfolioCategories } from "@/lib/data";
 
 export const revalidate = 60;
 
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 export default async function InstagramLinkPage() {
-  const settings = await getSiteSettings();
+  const [settings, categories] = await Promise.all([getSiteSettings(), getPortfolioCategories()]);
 
   return (
     <>
       <IconSprite />
-      <InstagramBio whatsappNumber={settings.whatsapp} />
+      <InstagramBio whatsappNumber={settings.whatsapp} categories={categories} />
     </>
   );
 }

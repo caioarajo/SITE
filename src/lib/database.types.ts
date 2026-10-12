@@ -835,6 +835,27 @@ export type Database = {
           },
         ]
       }
+      portfolio_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          label: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          label: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          label?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           caption: string | null
@@ -884,7 +905,15 @@ export type Database = {
           title?: string
           url?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_items_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "portfolio_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       products: {
         Row: {

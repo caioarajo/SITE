@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { PORTFOLIO_CATEGORIES } from "@/lib/portfolioCategories";
+import type { PortfolioCategoryRow } from "@/lib/types";
 import { captureInstagramClick } from "@/lib/captureInstagramClick";
 
 const container = {
@@ -14,7 +14,13 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 0.84, 0.36, 1] as const } },
 };
 
-export default function InstagramBio({ whatsappNumber }: { whatsappNumber: string }) {
+export default function InstagramBio({
+  whatsappNumber,
+  categories,
+}: {
+  whatsappNumber: string;
+  categories: PortfolioCategoryRow[];
+}) {
   const waHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Olá, Lia! Vim do Instagram e gostaria de saber mais sobre a assessoria para o meu evento."
   )}`;
@@ -60,8 +66,8 @@ export default function InstagramBio({ whatsappNumber }: { whatsappNumber: strin
           Portfólio por segmento
         </motion.div>
         <motion.div variants={item} className="bio-chip-row">
-          {PORTFOLIO_CATEGORIES.map((c) => (
-            <a key={c.value} className="bio-chip" href={`/?album=${c.value}#portfolio`}>
+          {categories.map((c) => (
+            <a key={c.slug} className="bio-chip" href={`/?album=${c.slug}#portfolio`}>
               {c.label}
             </a>
           ))}

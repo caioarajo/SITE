@@ -20,12 +20,10 @@ export type PayableStatus = "pendente" | "pago" | "cancelado";
 export type ReceivableStatus = "pendente" | "recebido" | "cancelado";
 export type RsvpStatus = "pendente" | "confirmado" | "recusado";
 export type TableShape = "round" | "rectangle";
-export type PortfolioCategory =
-  | "quinze_anos"
-  | "casamentos"
-  | "empresarial"
-  | "infantil"
-  | "eventos_gerais";
+// Categorias do portfolio sao gerenciadas pelo admin (tabela
+// portfolio_categories), entao o slug e uma string aberta, nao um union
+// fixo — o conjunto valido de verdade mora no banco (foreign key).
+export type PortfolioCategory = string;
 
 export type AgendaCategory = "reuniao" | "visita_tecnica" | "degustacao" | "prazo_fornecedor" | "dia_evento" | "interno";
 export type AgendaStatus = "pendente" | "em_andamento" | "concluido";
@@ -40,6 +38,8 @@ export type PortfolioItemRow = Omit<Tables["portfolio_items"]["Row"], "media_typ
   media_type: MediaType;
   category: PortfolioCategory;
 };
+
+export type PortfolioCategoryRow = Tables["portfolio_categories"]["Row"];
 
 export type TestimonialRow = Tables["testimonials"]["Row"];
 

@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import type { PortfolioItemRow, PortfolioCategory } from "@/lib/types";
-import { PORTFOLIO_CATEGORIES } from "@/lib/portfolioCategories";
+import type { PortfolioItemRow, PortfolioCategory, PortfolioCategoryRow } from "@/lib/types";
 import Reveal from "./Reveal";
 
 // Mesmo layout de mosaico do site original: 7 posições com tamanhos
@@ -13,10 +12,10 @@ const GRID_SPANS = ["gi-1", "gi-2", "gi-3", "gi-4", "gi-5", "gi-6", "gi-7"];
 const SEGMENT_SIZES = "(max-width: 560px) 100vw, (max-width: 940px) 50vw, 33vw";
 const GALLERY_SIZES = "(max-width: 940px) 50vw, 25vw";
 
-function readAlbumFromUrl(): PortfolioCategory | null {
+function readAlbumFromUrl(categories: PortfolioCategoryRow[]): PortfolioCategory | null {
   if (typeof window === "undefined") return null;
   const value = new URLSearchParams(window.location.search).get("album");
-  return (PORTFOLIO_CATEGORIES.find((c) => c.value === value)?.value as PortfolioCategory | undefined) ?? null;
+  return categories.find((c) => c.slug === value)?.slug ?? null;
 }
 
 /** Miniatura de um item: foto ou poster do vídeo, ambos via next/image
@@ -62,14 +61,21 @@ function ItemThumb({ item, sizes, alt }: { item: PortfolioItemRow; sizes: string
   );
 }
 
-export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
+export default function Portfolio({
+  items,
+  categories,
+}: {
+  items: PortfolioItemRow[];
+  categories: PortfolioCategoryRow[];
+}) {
   const [category, setCategory] = useState<PortfolioCategory | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // Permite abrir um álbum direto por link (?album=casamentos), sem
   // depender de useSearchParams (evita boundary de Suspense aqui).
   useEffect(() => {
-    setCategory(readAlbumFromUrl());
+    setCategory(readAlbumFromUrl(categories));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const grouped = useMemo(() => {
@@ -138,19 +144,19 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
               transition={{ duration: 0.3 }}
             >
               <Reveal className="segment-grid">
-                {PORTFOLIO_CATEGORIES.map((c) => {
-                  const catItems = grouped.get(c.value) ?? [];
+                {categories.map((c) => {
+                  const catItems = grouped.get(c.slug) ?? [];
                   const cover = catItems.find((i) => i.is_cover) ?? catItems[0];
                   const hasItems = catItems.length > 0;
 
                   return (
                     <div
-                      key={c.value}
+                      key={c.slug}
                       className={`segment-card ${!hasItems ? "empty" : ""}`}
-                      onClick={() => hasItems && openAlbum(c.value)}
+                      onClick={() => hasItems && openAlbum(c.slug)}
                       role={hasItems ? "button" : undefined}
                       tabIndex={hasItems ? 0 : undefined}
-                      onKeyDown={(e) => hasItems && e.key === "Enter" && openAlbum(c.value)}
+                      onKeyDown={(e) => hasItems && e.key === "Enter" && openAlbum(c.slug)}
                     >
                       <div className="segment-thumb">
                         {cover ? (
@@ -170,7 +176,7 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
                         disabled={!hasItems}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (hasItems) openAlbum(c.value);
+                          if (hasItems) openAlbum(c.slug);
                         }}
                       >
                         {hasItems ? "Ver Álbum Completo" : "Em breve"}
@@ -195,7 +201,7 @@ export default function Portfolio({ items }: { items: PortfolioItemRow[] }) {
                   </svg>
                   Voltar aos álbuns
                 </button>
-                <h3 className="serif">{PORTFOLIO_CATEGORIES.find((c) => c.value === category)?.label}</h3>
+                <h3 className="serif">{categories.find((c) => c.slug === category)?.label}</h3>
                 <span className="album-count">
                   {albumItems.length} {albumItems.length === 1 ? "registro" : "registros"}
                 </span>

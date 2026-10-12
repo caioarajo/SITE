@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { PortfolioItemRow, PortfolioCategory } from "@/lib/types";
-import { PORTFOLIO_CATEGORIES, PORTFOLIO_CATEGORY_LABELS } from "@/lib/portfolioCategories";
+import type { PortfolioItemRow, PortfolioCategory, PortfolioCategoryRow } from "@/lib/types";
+import { slugifyCategory } from "@/lib/portfolioCategories";
 import { captureVideoFrame } from "@/lib/videoPoster";
 import { isHeicSignature } from "@/lib/heic";
 import Modal from "@/components/admin/Modal";
@@ -21,22 +21,33 @@ async function uploadViaHeicConversion(file: File): Promise<{ path: string; url:
 
 export default function PortfolioAdminPage() {
   const [items, setItems] = useState<PortfolioItemRow[]>([]);
+  const [categories, setCategories] = useState<PortfolioCategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [editing, setEditing] = useState<PortfolioItemRow | null>(null);
-  const [uploadCategory, setUploadCategory] = useState<PortfolioCategory>("casamentos");
+  const [uploadCategory, setUploadCategory] = useState<PortfolioCategory>("");
   const [filter, setFilter] = useState<PortfolioCategory | "todos">("todos");
   const [dragItemId, setDragItemId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [generatingPoster, setGeneratingPoster] = useState(false);
+  const [newCategoryLabel, setNewCategoryLabel] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
+  const [editingCategoryLabel, setEditingCategoryLabel] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase.from("portfolio_items").select("*").order("display_order", { ascending: true });
-    setItems((data as PortfolioItemRow[] | null) ?? []);
+    const [itemsRes, categoriesRes] = await Promise.all([
+      supabase.from("portfolio_items").select("*").order("display_order", { ascending: true }),
+      supabase.from("portfolio_categories").select("*").order("display_order", { ascending: true }),
+    ]);
+    const loadedCategories = (categoriesRes.data as PortfolioCategoryRow[] | null) ?? [];
+    setItems((itemsRes.data as PortfolioItemRow[] | null) ?? []);
+    setCategories(loadedCategories);
+    setUploadCategory((prev) => prev || loadedCategories[0]?.slug || "");
     setLoading(false);
   }
 
@@ -44,6 +55,73 @@ export default function PortfolioAdminPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function categoryLabel(slug: string): string {
+    return categories.find((c) => c.slug === slug)?.label ?? slug;
+  }
+
+  async function addCategory(e: React.FormEvent) {
+    e.preventDefault();
+    const label = newCategoryLabel.trim();
+    if (!label) return;
+    const slug = slugifyCategory(label);
+    if (!slug) {
+      alert("Esse nome não gera um identificador válido. Tente outro.");
+      return;
+    }
+    if (categories.some((c) => c.slug === slug)) {
+      alert("Já existe um álbum com um nome muito parecido.");
+      return;
+    }
+    setSavingCategory(true);
+    const display_order = categories.length > 0 ? Math.max(...categories.map((c) => c.display_order)) + 1 : 0;
+    const { data, error } = await supabase
+      .from("portfolio_categories")
+      .insert({ slug, label, display_order })
+      .select("*")
+      .single();
+    setSavingCategory(false);
+    if (error) {
+      alert(`Não foi possível criar o álbum: ${error.message}`);
+      return;
+    }
+    setCategories((prev) => [...prev, data as PortfolioCategoryRow]);
+    setNewCategoryLabel("");
+    setUploadCategory((prev) => prev || (data as PortfolioCategoryRow).slug);
+  }
+
+  function startEditCategory(c: PortfolioCategoryRow) {
+    setEditingCategorySlug(c.slug);
+    setEditingCategoryLabel(c.label);
+  }
+
+  async function saveEditCategory(slug: string) {
+    const label = editingCategoryLabel.trim();
+    if (!label) return;
+    setCategories((prev) => prev.map((c) => (c.slug === slug ? { ...c, label } : c)));
+    setEditingCategorySlug(null);
+    const { error } = await supabase.from("portfolio_categories").update({ label }).eq("slug", slug);
+    if (error) alert(`Não foi possível salvar: ${error.message}`);
+  }
+
+  async function deleteCategory(c: PortfolioCategoryRow) {
+    const count = items.filter((i) => i.category === c.slug).length;
+    if (count > 0) {
+      alert(
+        `O álbum "${c.label}" tem ${count} ${count === 1 ? "item" : "itens"}. Mova ou apague essas fotos/vídeos antes de remover o álbum.`,
+      );
+      return;
+    }
+    if (!confirm(`Apagar o álbum "${c.label}"? Essa ação não pode ser desfeita.`)) return;
+    const { error } = await supabase.from("portfolio_categories").delete().eq("slug", c.slug);
+    if (error) {
+      alert(`Não foi possível apagar: ${error.message}`);
+      return;
+    }
+    setCategories((prev) => prev.filter((x) => x.slug !== c.slug));
+    if (filter === c.slug) setFilter("todos");
+    if (uploadCategory === c.slug) setUploadCategory(categories.find((x) => x.slug !== c.slug)?.slug ?? "");
+  }
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
@@ -252,6 +330,64 @@ export default function PortfolioAdminPage() {
       </div>
 
       <div className="admin-card" style={{ marginBottom: 20 }}>
+        <h2 style={{ marginBottom: 14 }}>Álbuns</h2>
+        <div className="category-list">
+          {categories.map((c) => (
+            <div className="category-row" key={c.slug}>
+              {editingCategorySlug === c.slug ? (
+                <>
+                  <input
+                    className="field-input"
+                    style={{ maxWidth: 260 }}
+                    value={editingCategoryLabel}
+                    autoFocus
+                    onChange={(e) => setEditingCategoryLabel(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEditCategory(c.slug);
+                      if (e.key === "Escape") setEditingCategorySlug(null);
+                    }}
+                  />
+                  <button className="admin-btn admin-btn-gold admin-btn-sm" onClick={() => saveEditCategory(c.slug)}>
+                    Salvar
+                  </button>
+                  <button className="admin-btn admin-btn-line admin-btn-sm" onClick={() => setEditingCategorySlug(null)}>
+                    Cancelar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="category-row-label">{c.label}</span>
+                  <span className="category-row-count">
+                    {counts[c.slug] ?? 0} {(counts[c.slug] ?? 0) === 1 ? "item" : "itens"}
+                  </span>
+                  <button className="admin-btn admin-btn-line admin-btn-sm" onClick={() => startEditCategory(c)}>
+                    Editar
+                  </button>
+                  <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => deleteCategory(c)}>
+                    Apagar
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+          {categories.length === 0 && (
+            <p style={{ fontSize: 13, color: "var(--taupe-deep)" }}>Nenhum álbum criado ainda.</p>
+          )}
+        </div>
+        <form className="category-add-form" onSubmit={addCategory}>
+          <input
+            className="field-input"
+            placeholder="Nome do novo álbum (ex.: Chá de Bebê)"
+            value={newCategoryLabel}
+            onChange={(e) => setNewCategoryLabel(e.target.value)}
+          />
+          <button type="submit" className="admin-btn admin-btn-gold admin-btn-sm" disabled={savingCategory}>
+            {savingCategory ? "Criando..." : "+ Novo álbum"}
+          </button>
+        </form>
+      </div>
+
+      <div className="admin-card" style={{ marginBottom: 20 }}>
         <div className="field-group" style={{ marginBottom: 12, maxWidth: 360 }}>
           <label className="field-label">Enviar para o álbum</label>
           <select
@@ -259,8 +395,8 @@ export default function PortfolioAdminPage() {
             value={uploadCategory}
             onChange={(e) => setUploadCategory(e.target.value as PortfolioCategory)}
           >
-            {PORTFOLIO_CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
+            {categories.map((c) => (
+              <option key={c.slug} value={c.slug}>
                 {c.label}
               </option>
             ))}
@@ -283,7 +419,7 @@ export default function PortfolioAdminPage() {
         >
           {uploading
             ? "Enviando..."
-            : `Clique ou arraste fotos e vídeos aqui para adicionar ao álbum "${PORTFOLIO_CATEGORY_LABELS[uploadCategory]}"`}
+            : `Clique ou arraste fotos e vídeos aqui para adicionar ao álbum "${categoryLabel(uploadCategory)}"`}
           <input
             ref={fileInputRef}
             type="file"
@@ -298,13 +434,13 @@ export default function PortfolioAdminPage() {
         <button className={`admin-btn admin-btn-sm ${filter === "todos" ? "admin-btn-gold" : "admin-btn-line"}`} onClick={() => setFilter("todos")}>
           Todos ({items.length})
         </button>
-        {PORTFOLIO_CATEGORIES.map((c) => (
+        {categories.map((c) => (
           <button
-            key={c.value}
-            className={`admin-btn admin-btn-sm ${filter === c.value ? "admin-btn-gold" : "admin-btn-line"}`}
-            onClick={() => setFilter(c.value)}
+            key={c.slug}
+            className={`admin-btn admin-btn-sm ${filter === c.slug ? "admin-btn-gold" : "admin-btn-line"}`}
+            onClick={() => setFilter(c.slug)}
           >
-            {c.label} ({counts[c.value] ?? 0})
+            {c.label} ({counts[c.slug] ?? 0})
           </button>
         ))}
       </div>
@@ -359,7 +495,7 @@ export default function PortfolioAdminPage() {
                 <span className="cap">
                   {item.title}
                   <br />
-                  <small>{PORTFOLIO_CATEGORY_LABELS[item.category]}</small>
+                  <small>{categoryLabel(item.category)}</small>
                 </span>
               </div>
               <div className="media-actions">
@@ -449,8 +585,8 @@ export default function PortfolioAdminPage() {
                 value={editing.category}
                 onChange={(e) => setEditing({ ...editing, category: e.target.value as PortfolioCategory })}
               >
-                {PORTFOLIO_CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>
+                {categories.map((c) => (
+                  <option key={c.slug} value={c.slug}>
                     {c.label}
                   </option>
                 ))}
