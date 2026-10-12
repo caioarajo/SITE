@@ -1138,33 +1138,36 @@ export type Database = {
           couple_names: string
           created_at: string
           display_order: number
+          focal_x: number | null
+          focal_y: number | null
           id: string
           is_featured: boolean
           is_published: boolean
           photo_url_1: string | null
-          photo_url_2: string | null
           quote: string
         }
         Insert: {
           couple_names: string
           created_at?: string
           display_order?: number
+          focal_x?: number | null
+          focal_y?: number | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
           photo_url_1?: string | null
-          photo_url_2?: string | null
           quote: string
         }
         Update: {
           couple_names?: string
           created_at?: string
           display_order?: number
+          focal_x?: number | null
+          focal_y?: number | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
           photo_url_1?: string | null
-          photo_url_2?: string | null
           quote?: string
         }
         Relationships: []

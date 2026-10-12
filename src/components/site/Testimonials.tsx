@@ -58,7 +58,16 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
               <div className="fq-photo">
                 <span className="fq-photo-mat" aria-hidden="true" />
                 <div className="fq-photo-frame">
-                  <img src={featured.photo_url_1} alt={featured.couple_names} />
+                  <img
+                    src={featured.photo_url_1}
+                    alt={featured.couple_names}
+                    style={{
+                      objectPosition:
+                        featured.focal_x != null && featured.focal_y != null
+                          ? `${featured.focal_x}% ${featured.focal_y}%`
+                          : "center 20%",
+                    }}
+                  />
                 </div>
               </div>
             )}

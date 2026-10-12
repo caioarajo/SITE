@@ -5,19 +5,8 @@ import { createClient } from "@/lib/supabase/client";
 import type { PortfolioItemRow, PortfolioCategory, PortfolioCategoryRow } from "@/lib/types";
 import { slugifyCategory } from "@/lib/portfolioCategories";
 import { captureVideoFrame } from "@/lib/videoPoster";
-import { isHeicSignature } from "@/lib/heic";
+import { uploadImageFile } from "@/lib/uploadMedia";
 import Modal from "@/components/admin/Modal";
-
-/** Sobe uma imagem HEIC/HEIF (detectada pelos bytes, não pela extensão) via
- * rota de servidor que converte para JPEG antes de salvar no storage. */
-async function uploadViaHeicConversion(file: File): Promise<{ path: string; url: string }> {
-  const formData = new FormData();
-  formData.append("file", file);
-  const res = await fetch("/api/admin/portfolio/upload", { method: "POST", body: formData });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Falha ao converter e enviar a foto.");
-  return data;
-}
 
 export default function PortfolioAdminPage() {
   const [items, setItems] = useState<PortfolioItemRow[]>([]);
@@ -144,26 +133,14 @@ export default function PortfolioAdminPage() {
 
         // Fotos de iPhone às vezes chegam como HEIC/HEIF salvo com extensão
         // ".jpg" (sem conversão real) — o navegador não decodifica isso,
-        // então a miniatura fica quebrada. Detecta pelos bytes do arquivo
-        // (não pela extensão) e, só nesse caso, converte no servidor antes
-        // de subir. Qualquer outro arquivo sobe direto, como sempre.
+        // então a miniatura fica quebrada. uploadImageFile detecta isso
+        // pelos bytes do arquivo e, só nesse caso, converte no servidor
+        // antes de subir. Qualquer outro arquivo (incluindo vídeo) sobe
+        // direto, como sempre.
         let path: string;
         let publicUrl: string;
         try {
-          if (!isVideo && isHeicSignature(new Uint8Array(await file.slice(0, 12).arrayBuffer()))) {
-            const converted = await uploadViaHeicConversion(file);
-            path = converted.path;
-            publicUrl = converted.url;
-          } else {
-            const ext = file.name.split(".").pop();
-            path = `uploads/${crypto.randomUUID()}.${ext}`;
-            const { error: uploadError } = await supabase.storage.from("portfolio").upload(path, file, {
-              cacheControl: "3600",
-              upsert: false,
-            });
-            if (uploadError) throw new Error(uploadError.message);
-            publicUrl = supabase.storage.from("portfolio").getPublicUrl(path).data.publicUrl;
-          }
+          ({ path, url: publicUrl } = await uploadImageFile(file));
         } catch (err) {
           alert(`Erro ao enviar ${file.name}: ${err instanceof Error ? err.message : "erro desconhecido"}`);
           continue;
