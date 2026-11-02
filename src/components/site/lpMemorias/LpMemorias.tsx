@@ -90,7 +90,7 @@ export default function LpMemorias({ whatsapp, email, instagram, sampleQr }: Pro
       </section>
 
       {/* 3. O problema */}
-      <section className="fv-narrow">
+      <section className="fv-narrow fv-navy">
         <Reveal className="wrap fv-text">
           <Eyebrow>O que se perde</Eyebrow>
           <h2 className="serif">As fotos mais espontâneas do seu casamento costumam ficar esquecidas no celular de alguém.</h2>

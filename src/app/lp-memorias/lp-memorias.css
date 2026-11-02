@@ -43,6 +43,11 @@
 .fv-text h2{margin:14px 0 22px;}
 .fv-text p{margin-top:14px; font-size:17px; color:#5b4f42;}
 .fv-text strong{font-weight:500; color:var(--navy);}
+.fv-navy{background:var(--navy); color:var(--cream);}
+.fv .fv-navy h2.serif{color:var(--cream);}
+.fv-navy .eyebrow{color:#d4ad6d;}
+.fv-navy .fv-text p{color:rgba(250,246,239,.86);}
+.fv-navy .fv-text strong{color:var(--cream);}
 .fv-text-wide{max-width:900px;}
 .fv-text-wide h2{margin:14px 0 28px;}
 
