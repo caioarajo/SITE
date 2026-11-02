@@ -187,6 +187,8 @@ export default function LiveDemo({ qr }: { qr: string }) {
           </div>
           {/* Como no telão real: título, legenda e QR code numa coluna, sem cobrir as fotos. */}
           <aside className="fv-demo-side">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="fv-demo-side-logo" src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
             <p className="fv-demo-side-title serif">Ana &amp; Pedro</p>
             <div className="fv-demo-side-credit">
               {!paused && layout === "cinema" && approved.length > 0 && (

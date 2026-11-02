@@ -347,7 +347,8 @@ export default function WallClient({ token, initial }: { token: string; initial:
 
       {idle && (
         <div className="tl-idle">
-          <Spark className="tl-idle-spark" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="tl-idle-logo" src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
           <h1 className="tl-serif">{settings.title}</h1>
           <p className="tl-idle-sub">
             {settings.wallPaused ? settings.pauseMessage : "Aponte a câmera para o QR code e seja o primeiro a aparecer aqui"}
@@ -361,6 +362,8 @@ export default function WallClient({ token, initial }: { token: string; initial:
 
       {!idle && (
         <aside className="tl-side">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="tl-side-logo" src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
           <div className="tl-wall-title">
             <Spark className="tl-wall-spark" />
             <span className="tl-serif">{settings.title}</span>

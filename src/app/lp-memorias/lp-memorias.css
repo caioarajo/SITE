@@ -23,9 +23,9 @@
 .fv-actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:30px;}
 .fv-proof{margin-top:20px; font-size:14px; color:var(--taupe-deep);}
 .fv-hero-visual{position:relative; padding-bottom:40px;}
-.fv-screen{position:relative; margin-right:24%; aspect-ratio:16/10; overflow:hidden; border:10px solid var(--navy-deep); border-radius:10px; box-shadow:var(--shadow); background:var(--navy-deep);}
+.fv-screen{position:relative; margin-right:24%; aspect-ratio:16/10; overflow:hidden; border:10px solid #000; border-radius:10px; box-shadow:var(--shadow); background:#000;}
 .fv-screen img{width:100%; height:calc(100% - 56px); object-fit:contain;}
-.fv-screen-credit{position:absolute; left:0; right:0; bottom:0; height:56px; padding:6px 14px; background:var(--navy-deep); color:#fff;}
+.fv-screen-credit{position:absolute; left:0; right:0; bottom:0; height:56px; padding:6px 14px; background:#000; color:#fff;}
 .fv-screen-credit p{font:italic 500 20px/1.2 'Cormorant Garamond', serif;}
 .fv-screen-credit small{color:#e6d3b3; font-size:13px;}
 .fv-screen-qr{position:absolute; top:5px; right:6px; display:block; width:46px; height:46px; padding:2px; background:#fff; border-radius:3px;}
@@ -101,7 +101,7 @@
 .fv-demo-queue-actions .is-primary{background:var(--navy); border-color:var(--navy); color:#fff;}
 .fv-demo-link{display:block; margin-top:12px; padding:6px 0; border:0; background:none; color:#a23b34; font-size:13px; text-decoration:underline;}
 .fv-demo-count{margin-top:10px; color:var(--taupe-deep); font-size:13px;}
-.fv-demo-wall{position:relative; aspect-ratio:16/9; overflow:hidden; border:8px solid #000; border-radius:8px; background:var(--navy);}
+.fv-demo-wall{position:relative; aspect-ratio:16/9; overflow:hidden; border:8px solid #000; border-radius:8px; background:#000;}
 .fv-demo-idle{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; text-align:center;}
 .fv-demo-idle p{font-size:clamp(24px, 3.4vw, 42px); font-style:italic; color:#fff;}
 .fv-demo-idle small{font:italic 500 clamp(15px, 1.7vw, 21px) 'Cormorant Garamond', serif;}
@@ -109,7 +109,8 @@
 .fv-demo-bg{position:absolute; inset:-8%; width:116%; max-width:none; height:116%; object-fit:cover; filter:blur(22px) brightness(.45);}
 .fv-demo-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:contain;}
 .fv-demo-stage{position:absolute; top:0; bottom:0; left:0; right:20%; overflow:hidden;}
-.fv-demo-side{position:absolute; top:0; right:0; bottom:0; width:20%; display:flex; flex-direction:column; gap:6px; padding:8px; background:var(--navy-deep); color:#fff;}
+.fv-demo-side{position:absolute; top:0; right:0; bottom:0; width:20%; display:flex; flex-direction:column; gap:6px; padding:8px; background:#000; color:#fff;}
+.fv-demo-side-logo{display:block; width:100%; height:auto;}
 .fv-demo-side-title{font-size:clamp(11px, 1.3vw, 17px); font-style:italic; line-height:1.15; color:#fff;}
 .fv-demo-side-credit{flex:1; min-height:0; display:flex; align-items:center; overflow:hidden;}
 .fv-demo-credit{min-width:0; overflow-wrap:anywhere;}
@@ -121,12 +122,12 @@
 .fv-demo-credit p{font:italic 500 clamp(11px, 1.5vw, 19px)/1.15 'Cormorant Garamond', serif;}
 .fv-demo-credit small{color:#e6d3b3; font-size:clamp(9px, 1vw, 13px);}
 .fv-demo-mosaic{position:absolute; inset:0; display:grid; grid-auto-rows:1fr; gap:3px;}
-.fv-demo-mosaic img{width:100%; height:100%; min-height:0; object-fit:contain; background:var(--navy-deep);}
+.fv-demo-mosaic img{width:100%; height:100%; min-height:0; object-fit:contain; background:#000;}
 .fv-demo-mosaic img.is-current{outline:3px solid #d4ad6d; outline-offset:-3px;}
 .fv-demo-slide{margin-top:10px; font-size:14px; color:rgba(250,246,239,.78);}
-.fv-demo-board{position:absolute; inset:0; background:radial-gradient(circle at 50% 40%, var(--navy), var(--navy-deep));}
+.fv-demo-board{position:absolute; inset:0; background:#000;}
 .fv-demo-board figure{position:absolute; width:29%; margin:0; padding:4px 4px 0; background:#fbf8f2; box-shadow:0 8px 20px rgba(0,0,0,.45);}
-.fv-demo-board img{width:100%; height:clamp(52px, 11vw, 150px); object-fit:contain; background:var(--navy-deep);}
+.fv-demo-board img{width:100%; height:clamp(52px, 11vw, 150px); object-fit:contain; background:#000;}
 .fv-demo-board figcaption{padding:1px; color:var(--espresso); font:italic 500 clamp(10px, 1.1vw, 14px) 'Cormorant Garamond', serif; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .fv-demo-heart{position:absolute; bottom:4px; color:#e8a5a0; font-size:28px; animation:fv-rise 2.1s var(--ease) forwards; pointer-events:none;}
 @keyframes fv-rise{
