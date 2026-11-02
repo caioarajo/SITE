@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
+import { createClient } from "@/lib/supabase/client";
 import type { TestimonialRow } from "@/lib/types";
 import Reveal from "../Reveal";
 import { CHALLENGES, EVENT_TYPES, FAQS, FEATURE_GROUPS, PLANS, STEPS } from "./content";
@@ -42,10 +43,13 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
       <section className="fv-hero">
         <div className="wrap fv-hero-grid">
           <div>
-            <a href="/" className="fv-logo" aria-label="Página inicial da LP Assessoria e Cerimonial">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-full-navy.png" alt="LP Assessoria e Cerimonial" />
-            </a>
+            <div className="fv-topbar">
+              <a href="#top" className="fv-logo" aria-label="LP Memórias, início da página">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-lp-memorias-navy.png" alt="LP Memórias" />
+              </a>
+              <PanelButton />
+            </div>
             <h1 className="serif">
               Seu casamento por <em>todos os ângulos</em>
             </h1>
@@ -200,9 +204,9 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
           </Reveal>
           <Reveal>
             <Eyebrow>Confiança</Eyebrow>
-            <h2 className="serif">Quem cuida do seu telão é quem entende de festa</h2>
+            <h2 className="serif">Quem cuida do seu evento é quem entende de festa</h2>
             <p className="fv-trust-big serif">+15 anos</p>
-            <p className="fv-trust-sub">de experiência da Lia Pontes em Manaus, especialista em casamentos católicos e com atuação em 15 anos, formaturas e outros eventos.</p>
+            <p className="fv-trust-sub">de experiência da Lia Pontes em Manaus, especialista em casamentos católicos e com atuação em 15 anos e outros eventos.</p>
             <p>
               Tecnologia sozinha não faz uma festa bonita. Saber a hora de pausar o telão para a entrada dos noivos faz parte do mesmo
               cuidado de um bom cerimonial.
@@ -353,9 +357,9 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
 
       <footer>
         <div className="wrap">
-          <a className="brand" href="/">
+          <a className="brand" href="#top">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-full-cream.png" alt="LP Assessoria e Cerimonial" />
+            <img src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
           </a>
           <nav aria-label="Seções da página">
             <a href="#como-funciona">Como funciona</a>
@@ -381,6 +385,30 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
 
       <StickyCta />
     </div>
+  );
+}
+
+/** Mesmo login do painel do site principal; aqui leva direto aos eventos da LP Memórias. */
+function PanelButton() {
+  // "unknown" enquanto a sessão não foi checada: evita piscar "Entrar" e trocar para "Painel".
+  const [session, setSession] = useState<"unknown" | "out" | "in">("unknown");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setSession(user ? "in" : "out"));
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, authSession) => {
+      setSession(authSession?.user ? "in" : "out");
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (session === "unknown") return null;
+  return (
+    <a className="btn btn-line fv-panel-btn" href={session === "in" ? "/admin/memorias" : "/admin/login?redirectTo=%2Fadmin%2Fmemorias"}>
+      {session === "in" ? "Painel" : "Entrar"}
+    </a>
   );
 }
 

@@ -13,7 +13,9 @@
 /* Abertura */
 .fv section.fv-hero{padding:40px 0 72px;}
 .fv-hero-grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:56px; align-items:center;}
-.fv-logo{display:inline-block; margin-bottom:36px;}
+.fv-topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:36px;}
+.fv-logo{display:inline-block;}
+.fv .fv-panel-btn{padding:10px 18px; font-size:12px;}
 .fv-logo img{height:64px; width:auto;}
 .fv-hero h1{font-size:clamp(38px, 5.2vw, 62px); line-height:1.1; color:var(--navy);}
 .fv-hero h1 em{color:var(--gold);}
@@ -211,7 +213,7 @@
   .fv .wrap{padding:0 16px;}
   .fv-hero-grid,.fv-trust-grid,.fv-final-grid,.fv-compare,.fv-feature-grid,.fv-plans,.fv-bonus-grid{grid-template-columns:minmax(0, 1fr);}
   .fv-hero-grid{gap:32px;}
-  .fv-logo{margin-bottom:24px;}
+  .fv-topbar{margin-bottom:24px;}
   .fv-actions .btn{flex:1 1 100%;}
   .fv-phone{right:0;}
   .fv-trust-grid{gap:28px;}
