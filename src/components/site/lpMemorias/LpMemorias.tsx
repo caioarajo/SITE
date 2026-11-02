@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { captureWhatsappClick } from "@/lib/captureWhatsappClick";
 import { createClient } from "@/lib/supabase/client";
-import type { TestimonialRow } from "@/lib/types";
 import Reveal from "../Reveal";
 import { CHALLENGES, EVENT_TYPES, FAQS, FEATURE_GROUPS, PLANS, STEPS } from "./content";
 import LiveDemo from "./LiveDemo";
@@ -13,7 +12,6 @@ interface Props {
   whatsapp: string;
   email: string;
   instagram: string;
-  testimonials: TestimonialRow[];
   sampleQr: string;
 }
 
@@ -30,7 +28,7 @@ function Eyebrow({ children, center }: { children: string; center?: boolean }) {
   );
 }
 
-export default function LpMemorias({ whatsapp, email, instagram, testimonials, sampleQr }: Props) {
+export default function LpMemorias({ whatsapp, email, instagram, sampleQr }: Props) {
   const defaultMessage = "Olá, Lia! Quero saber mais sobre a LP Memórias para o meu evento.";
 
   return (
@@ -194,39 +192,6 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
             ))}
           </div>
         </div>
-      </section>
-
-      {/* 7. Confiança */}
-      <section className="fv-trust">
-        <div className="wrap fv-trust-grid">
-          <Reveal>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="fv-trust-photo" src="/images/lia-portrait.jpg" alt="Lia Pontes" loading="lazy" />
-          </Reveal>
-          <Reveal>
-            <Eyebrow>Confiança</Eyebrow>
-            <h2 className="serif">Quem cuida do seu evento é quem entende de festa</h2>
-            <p className="fv-trust-big serif">+15 anos</p>
-            <p className="fv-trust-sub">de experiência da Lia Pontes em Manaus, especialista em casamentos católicos e com atuação em 15 anos e outros eventos.</p>
-            <p>
-              Tecnologia sozinha não faz uma festa bonita. Saber a hora de pausar o telão para a entrada dos noivos faz parte do mesmo
-              cuidado de um bom cerimonial.
-            </p>
-          </Reveal>
-        </div>
-        {testimonials.length > 0 && (
-          <div className="wrap">
-            <p className="fv-trust-label">O que dizem do trabalho da Lia como cerimonialista</p>
-            <div className="fv-testimonials">
-              {testimonials.map((t) => (
-                <figure key={t.id}>
-                  <blockquote>&ldquo;{t.quote}&rdquo;</blockquote>
-                  <figcaption>{t.couple_names}</figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        )}
       </section>
 
       {/* 8. Valor */}

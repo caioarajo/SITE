@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import QRCode from "qrcode";
 import IconSprite from "@/components/site/IconSprite";
 import LpMemorias from "@/components/site/lpMemorias/LpMemorias";
-import { getSiteSettings, getTestimonials } from "@/lib/data";
+import { getSiteSettings } from "@/lib/data";
 import "./lp-memorias.css";
 
 export const revalidate = 60;
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LpMemoriasPage() {
-  const [settings, testimonials] = await Promise.all([getSiteSettings(), getTestimonials()]);
+  const settings = await getSiteSettings();
 
   // QR code de verdade nas amostras de cartão: quem escanear cai no WhatsApp da Lia.
   const sampleQr = await QRCode.toString(`https://wa.me/${settings.whatsapp}`, {
@@ -33,7 +33,6 @@ export default async function LpMemoriasPage() {
         whatsapp={settings.whatsapp}
         email={settings.email}
         instagram={settings.instagram}
-        testimonials={testimonials.filter((t) => t.quote.length <= 320).slice(0, 3)}
         sampleQr={sampleQr}
       />
     </>
