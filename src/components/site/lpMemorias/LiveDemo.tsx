@@ -46,6 +46,14 @@ export default function LiveDemo({ qr }: { qr: string }) {
     if (auto) publish(i);
     else setPending((p) => [...p, i]);
   };
+  // Ao marcar, o que estava aguardando também vai para o telão.
+  const toggleAuto = (checked: boolean) => {
+    setAuto(checked);
+    if (!checked || !pending.length) return;
+    setApproved((a) => [...a, ...pending]);
+    setShownId(pending[0]);
+    setPending([]);
+  };
   const approve = (i: number) => {
     setPending((p) => p.filter((x) => x !== i));
     publish(i);
@@ -106,11 +114,11 @@ export default function LiveDemo({ qr }: { qr: string }) {
         <p className="fv-demo-label"><span>2</span> Painel de aprovação</p>
         <div className="fv-demo-panel">
           <label className="fv-demo-toggle">
-            <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} />
+            <input type="checkbox" checked={auto} onChange={(e) => toggleAuto(e.target.checked)} />
             Publicar sem aprovação
           </label>
           {pending.length === 0 ? (
-            <p className="fv-demo-empty">{sent.length ? "Nenhuma foto aguardando." : "As fotos enviadas chegam aqui."}</p>
+            <p className="fv-demo-empty" role="status">{auto ? "Sem aprovação: as fotos enviadas vão direto para o telão." : sent.length ? "Nenhuma foto aguardando." : "As fotos enviadas chegam aqui."}</p>
           ) : (
             <ul className="fv-demo-queue">
               {pending.map((i) => (
@@ -137,7 +145,7 @@ export default function LiveDemo({ qr }: { qr: string }) {
 
       <div className="fv-demo-col fv-demo-col-wide">
         <p className="fv-demo-label"><span>3</span> Telão da festa</p>
-        <div className="fv-demo-wall" data-testid="demo-wall">
+        <div className={`fv-demo-wall ${!paused && layout === "mosaico" && approved.length > 0 ? "is-mosaico" : ""}`} data-testid="demo-wall">
           <div className="fv-demo-stage">
           {paused ? (
             <div className="fv-demo-idle">
@@ -168,16 +176,13 @@ export default function LiveDemo({ qr }: { qr: string }) {
           ) : (
             <div className="fv-demo-board">
               {approved.map((i, n) => (
-                <motion.figure
-                  key={i}
-                  initial={{ opacity: 0, scale: 1.4 }}
-                  animate={{ opacity: 1, scale: i === current ? 1.08 : 1, rotate: ((i * 7) % 11) - 5 }}
-                  style={{ left: `${2 + (n % 3) * 30}%`, top: `${n >= 3 ? 55 : 14}%`, zIndex: i === current ? 2 : 1 }}
-                >
+                <div key={i} className="fv-demo-cell" style={{ left: `${1 + (n % 3) * 32.5}%`, top: `${n >= 3 ? 56 : 17}%`, zIndex: i === current ? 2 : 1 }}>
+                  <motion.figure initial={{ opacity: 0, scale: 1.4 }} animate={{ opacity: 1, scale: i === current ? 1.06 : 1, rotate: ((i * 7) % 11) - 5 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={SAMPLES[i].src} alt={`Foto enviada por ${SAMPLES[i].name}`} />
                   <figcaption>{SAMPLES[i].name}</figcaption>
                 </motion.figure>
+                </div>
               ))}
             </div>
           )}

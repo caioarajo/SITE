@@ -101,7 +101,7 @@
 .fv-demo-queue-actions .is-primary{background:var(--navy); border-color:var(--navy); color:#fff;}
 .fv-demo-link{display:block; margin-top:12px; padding:6px 0; border:0; background:none; color:#a23b34; font-size:13px; text-decoration:underline;}
 .fv-demo-count{margin-top:10px; color:var(--taupe-deep); font-size:13px;}
-.fv-demo-wall{position:relative; aspect-ratio:16/9; overflow:hidden; border:8px solid #000; border-radius:8px; background:#000;}
+.fv-demo-wall{container-type:inline-size; position:relative; aspect-ratio:16/9; overflow:hidden; border:8px solid #000; border-radius:8px; background:#000;}
 .fv-demo-idle{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; text-align:center;}
 .fv-demo-idle p{font-size:clamp(24px, 3.4vw, 42px); font-style:italic; color:#fff;}
 .fv-demo-idle small{font:italic 500 clamp(15px, 1.7vw, 21px) 'Cormorant Garamond', serif;}
@@ -113,6 +113,14 @@
 .fv-demo-brand{top:3%; left:1.6%; display:flex; align-items:center; gap:5px; padding:2px 8px 2px 2px;}
 .fv-demo-brand img{width:auto; height:clamp(20px, 3vw, 34px);}
 .fv-demo-brand span{padding-left:5px; border-left:1px solid rgba(212,173,109,.7); font-size:clamp(10px, 1vw, 13px); font-style:italic; line-height:1.2; white-space:nowrap;}
+/* Mosaico: faixa fina embaixo para logo, nome e QR code, sem cobrir as fotos. */
+.fv-demo-wall.is-mosaico{--fv-band:max(46px, 8.5cqw);}
+.fv-demo-wall.is-mosaico .fv-demo-stage{bottom:var(--fv-band);}
+.fv-demo-wall.is-mosaico .fv-demo-brand{top:auto; bottom:0; left:1.6%; height:var(--fv-band); padding:0; border:0; border-radius:0; background:none; backdrop-filter:none; -webkit-backdrop-filter:none;}
+.fv-demo-wall.is-mosaico .fv-demo-brand img{height:calc(var(--fv-band) * .68);}
+.fv-demo-wall.is-mosaico .fv-demo-qr{right:1.6%; bottom:0; width:auto; height:var(--fv-band); display:flex; flex-direction:row-reverse; align-items:center; gap:5px; padding:0; border-radius:0; background:none; color:var(--cream);}
+.fv-demo-wall.is-mosaico .fv-demo-qr span{width:calc(var(--fv-band) - 6px);}
+.fv-demo-wall.is-mosaico .fv-demo-qr small{margin:0; font-size:clamp(8px, 1.5cqw, 11px);}
 .fv-demo-credit{left:1.6%; bottom:4%; max-width:44%; padding:3px 8px; border-left:2px solid #d4ad6d; overflow-wrap:anywhere;}
 .fv-demo-qr{position:absolute; z-index:3; right:1.6%; bottom:4%; width:clamp(50px, 10.5%, 78px); padding:3px; border-radius:3px; background:#fff; color:var(--navy); text-align:center;}
 .fv-demo-qr span{display:block;}
@@ -126,9 +134,10 @@
 .fv-demo-mosaic img.is-current{outline:3px solid #d4ad6d; outline-offset:-3px;}
 .fv-demo-slide{margin-top:10px; font-size:14px; color:rgba(250,246,239,.78);}
 .fv-demo-board{position:absolute; inset:0; background:#000;}
-.fv-demo-board figure{position:absolute; width:27%; margin:0; padding:4px 4px 0; background:#fbf8f2; box-shadow:0 8px 20px rgba(0,0,0,.45);}
-.fv-demo-board img{width:100%; height:clamp(44px, 9.5vw, 128px); object-fit:contain; background:#000;}
-.fv-demo-board figcaption{padding:1px; color:var(--espresso); font:italic 500 clamp(10px, 1.1vw, 14px) 'Cormorant Garamond', serif; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.fv-demo-cell{position:absolute; width:32.5%; height:38%; display:flex; align-items:center; justify-content:center;}
+.fv-demo-board figure{position:relative; width:fit-content; margin:0; padding:4px 4px 0; background:#fbf8f2; box-shadow:0 8px 20px rgba(0,0,0,.45);}
+.fv-demo-board img{display:block; width:auto; height:auto; max-width:27cqw; max-height:16.5cqw;}
+.fv-demo-board figcaption{width:0; min-width:100%; padding:1px; color:var(--espresso); font:italic 500 clamp(10px, 1.1vw, 14px) 'Cormorant Garamond', serif; text-align:center; line-height:1.1;}
 .fv-demo-heart{position:absolute; bottom:4px; color:#e8a5a0; font-size:28px; animation:fv-rise 2.1s var(--ease) forwards; pointer-events:none;}
 @keyframes fv-rise{
   0%{transform:translateY(0) scale(.7); opacity:0;}

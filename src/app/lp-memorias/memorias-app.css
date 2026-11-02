@@ -182,11 +182,14 @@
 .tl-tile{position:absolute; inset:0; width:100%; height:100%; object-fit:contain;}
 .tl-tile-bg{position:absolute; inset:-8%; width:116%; height:116%; max-width:none; object-fit:cover; filter:blur(18px) brightness(.5);}
 .tl-board{position:absolute; inset:0; background:#000;}
-.tl-polaroid{position:absolute; width:25vw; margin:0; padding:.8vw .8vw 0; background:#fbf8f2; color:var(--espresso); box-shadow:0 2vh 5vh rgba(0,0,0,.45);}
-.tl-polaroid-media{position:relative; height:32vh; overflow:hidden; background:var(--cream-alt);}
+.tl-polaroid-cell{position:absolute; width:30.5%; height:39%; display:flex; align-items:center; justify-content:center;}
+.tl-polaroid{position:relative; width:fit-content; margin:0; padding:.8vw .8vw 0; background:#fbf8f2; color:var(--espresso); box-shadow:0 2vh 5vh rgba(0,0,0,.45);}
+.tl-polaroid-media{position:relative; overflow:hidden; background:var(--cream-alt);}
+.tl-polaroid-video{display:block; width:auto; height:auto; max-width:28vw; max-height:29vh;}
+/* width:0 + min-width:100%: a legenda acompanha a moldura, sem esticá-la. */
 .tl-polaroid figcaption{
-  padding:.5vw .2vw .7vw; font:italic 500 clamp(12px, 1.25vw, 24px)/1.25 'Cormorant Garamond', serif; text-align:center;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  width:0; min-width:100%; padding:.5vw .2vw .7vw; font:italic 500 clamp(12px, 1.25vw, 24px)/1.25 'Cormorant Garamond', serif; text-align:center;
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden;
 }
 .tl-idle{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2.4vh; padding:4vh 6vw; text-align:center; background:#000;}
 .tl-idle h1{font-size:clamp(34px, 6.5vw, 120px); line-height:1.1; color:#fff;}
@@ -232,6 +235,23 @@
 .tl-event-list a:hover strong,.tl-event-list a:focus-visible strong{color:var(--gold);}
 .tl-event-list strong{font-weight:500; color:var(--navy); font-size:17px;}
 .tl-event-list span{font-size:14px; color:var(--taupe-deep);}
+
+/* Mosaico: várias fotos até as bordas. Uma faixa fina embaixo guarda logo, nome e QR code, sem cobrir nenhuma. */
+.tl-wall-mosaico{--tl-band:clamp(96px, 14vh, 160px);}
+.tl-wall-mosaico .tl-stage{bottom:var(--tl-band);}
+.tl-wall-mosaico .tl-brand{
+  top:auto; bottom:0; left:1.4vw; height:var(--tl-band); padding:0; gap:1vw;
+  border:0; border-radius:0; background:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+.tl-wall-mosaico .tl-brand img{height:calc(var(--tl-band) * .68);}
+.tl-wall-mosaico .tl-brand-title{padding-left:1vw; font-size:clamp(15px, 1.5vw, 30px); max-width:34vw; white-space:normal;}
+.tl-wall-mosaico .tl-wall-qr{
+  right:1.4vw; bottom:0; width:auto; height:var(--tl-band); display:flex; flex-direction:row-reverse; align-items:center; gap:.8vw;
+  padding:0; border-radius:0; background:none; box-shadow:none; color:var(--cream);
+}
+.tl-wall-mosaico .tl-wall-qr img{width:auto; height:calc(var(--tl-band) - 1.6vh); border-radius:3px;}
+.tl-wall-mosaico .tl-wall-qr span{font-size:clamp(12px, .85vw, 17px);}
+.tl-wall-mosaico .tl-wall-fs{top:auto; right:auto; left:50%; bottom:calc((var(--tl-band) - 36px) / 2); transform:translateX(-50%);}
 
 /* Clientes da LP Memórias */
 .tl-root .tl-tabs a{flex:0 0 auto; display:flex; align-items:center; min-height:44px; padding:8px 14px; border-bottom:2px solid transparent; color:var(--taupe-deep); font-size:15px;}

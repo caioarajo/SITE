@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Post, WallLayout, WallState } from "@/lib/memorias/types";
 import { useLiveState } from "@/lib/memorias/useLiveState";
 
@@ -175,7 +175,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
     return () => clearTimeout(timer);
   }, [totalHearts]);
 
-  // Tela cheia (tecla F), tela sempre ligada e cursor escondido.
+  // Tela cheia pelo botão ou pela tecla F (o F11 é do próprio navegador), tela sempre ligada e cursor escondido.
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleFullscreen = useCallback(() => {
     if (document.fullscreenElement) void document.exitFullscreen();
@@ -230,7 +230,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
   const idle = settings.wallPaused || posts.length === 0;
 
   return (
-    <div ref={rootRef} className={`tl-wall ${cursorIdle ? "tl-wall-nocursor" : ""}`} data-testid="wall">
+    <div ref={rootRef} className={`tl-wall ${cursorIdle ? "tl-wall-nocursor" : ""} ${!idle && layout === "mosaico" ? "tl-wall-mosaico" : ""}`} data-testid="wall">
       {/* A foto ocupa a tela toda; logo, nome, legenda e QR code ficam pequenos, nos cantos. */}
       {!idle && (
       <div className="tl-stage">
@@ -314,20 +314,24 @@ export default function WallClient({ token, initial }: { token: string; initial:
             {visible.map(({ slot, post }, i) => {
               const h = hash(post.id);
               return (
-                <motion.figure
+                <motion.div
                   key={slot.id}
-                  className="tl-polaroid"
-                  style={{ left: `${1 + (i % 3) * 32}%`, top: `${i >= 3 ? 51 : 11}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
-                  initial={{ opacity: 0, scale: 1.7, rotate: 0 }}
-                  animate={{ opacity: 1, scale: 1, rotate: (h % 13) - 6 }}
+                  className="tl-polaroid-cell"
+                  style={{ left: `${1 + (i % 3) * 30.5}%`, top: `${i >= 3 ? 51 : 11}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
                   exit={{ opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 90, damping: 15 }}
                 >
-                  <div className="tl-polaroid-media">
-                    <Tile post={post} src={mediaUrl(post.id)} onFailed={onMediaFailed} />
-                  </div>
-                  <figcaption>{[post.guestName, post.kind === "message" ? "" : post.caption].filter(Boolean).join(" · ") || " "}</figcaption>
-                </motion.figure>
+                  <motion.figure
+                    className="tl-polaroid"
+                    initial={{ opacity: 0, scale: 1.7, rotate: 0 }}
+                    animate={{ opacity: 1, scale: 1, rotate: (h % 13) - 6 }}
+                    transition={{ type: "spring", stiffness: 90, damping: 15 }}
+                  >
+                    <div className="tl-polaroid-media" style={polaroidSize(post)}>
+                      <Tile post={post} src={mediaUrl(post.id)} onFailed={onMediaFailed} framed />
+                    </div>
+                    <figcaption>{[post.guestName, post.kind === "message" ? "" : post.caption].filter(Boolean).join(" · ") || "\u00a0"}</figcaption>
+                  </motion.figure>
+                </motion.div>
               );
             })}
           </AnimatePresence>
@@ -392,11 +396,18 @@ export default function WallClient({ token, initial }: { token: string; initial:
       {!online && <div className="tl-wall-offline" title="Reconectando" data-testid="wall-offline" />}
       {!cursorIdle && (
         <button type="button" className="tl-wall-fs" onClick={toggleFullscreen}>
-          Tela cheia (F)
+          Tela cheia (F11)
         </button>
       )}
     </div>
   );
+}
+
+/** Moldura com a proporção exata da foto, dentro do espaço de cada polaroid. Vídeo toma o formato dele mesmo. */
+function polaroidSize(post: Post): CSSProperties | undefined {
+  if (post.kind === "message") return { width: "25vw", height: "29vh" };
+  if (!post.width || !post.height) return undefined;
+  return { width: `min(28vw, calc(29vh * ${post.width / post.height}))`, aspectRatio: `${post.width} / ${post.height}` };
 }
 
 function Credit({ post, compact }: { post: Post; compact?: boolean }) {
@@ -418,11 +429,14 @@ function MessageCard({ post }: { post: Post }) {
   );
 }
 
-function Tile({ post, src, onFailed }: { post: Post; src: string; onFailed: (id: string) => void }) {
+/** `framed`: a moldura do polaroid já tem o formato da foto, então não sobra espaço para preencher. */
+function Tile({ post, src, onFailed, framed }: { post: Post; src: string; onFailed: (id: string) => void; framed?: boolean }) {
   if (post.kind === "message") return <MessageCard post={post} />;
   if (post.kind === "video") {
-    return <video className="tl-tile" src={src} autoPlay muted loop playsInline onError={() => onFailed(post.id)} />;
+    return <video className={framed ? "tl-polaroid-video" : "tl-tile"} src={src} autoPlay muted loop playsInline onError={() => onFailed(post.id)} />;
   }
+  // eslint-disable-next-line @next/next/no-img-element
+  if (framed) return <img className="tl-tile" src={src} alt={post.caption || "Foto de convidado"} />;
   // A foto aparece inteira; a sobra do quadro é preenchida com ela mesma, desfocada.
   return (
     <>
