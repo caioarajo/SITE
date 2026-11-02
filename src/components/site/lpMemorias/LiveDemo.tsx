@@ -172,7 +172,7 @@ export default function LiveDemo({ qr }: { qr: string }) {
                   key={i}
                   initial={{ opacity: 0, scale: 1.4 }}
                   animate={{ opacity: 1, scale: i === current ? 1.08 : 1, rotate: ((i * 7) % 11) - 5 }}
-                  style={{ left: `${4 + (n % 3) * 32}%`, top: `${n >= 3 ? 52 : 7}%`, zIndex: i === current ? 2 : 1 }}
+                  style={{ left: `${2 + (n % 3) * 30}%`, top: `${n >= 3 ? 55 : 14}%`, zIndex: i === current ? 2 : 1 }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={SAMPLES[i].src} alt={`Foto enviada por ${SAMPLES[i].name}`} />
@@ -185,24 +185,22 @@ export default function LiveDemo({ qr }: { qr: string }) {
             <span key={id} className="fv-demo-heart" style={{ left: `${15 + (id % 70)}%` }} aria-hidden="true">♥</span>
           ))}
           </div>
-          {/* Como no telão real: título, legenda e QR code numa coluna, sem cobrir as fotos. */}
-          <aside className="fv-demo-side">
+          {/* Como no telão real: informações pequenas, nos cantos, sobre a foto. */}
+          <div className="fv-demo-brand">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="fv-demo-side-logo" src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
-            <p className="fv-demo-side-title serif">Ana &amp; Pedro</p>
-            <div className="fv-demo-side-credit">
-              {!paused && layout === "cinema" && approved.length > 0 && (
-                <div className="fv-demo-credit">
-                  <p>{SAMPLES[current].caption}</p>
-                  <small>{SAMPLES[current].name}</small>
-                </div>
-              )}
+            <img src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
+            <span className="serif">Ana &amp; Pedro</span>
+          </div>
+          {!paused && layout === "cinema" && approved.length > 0 && (
+            <div className="fv-demo-credit">
+              <p>{SAMPLES[current].caption}</p>
+              <small>{SAMPLES[current].name}</small>
             </div>
-            <div className="fv-demo-qr" data-testid="demo-qr">
-              <span dangerouslySetInnerHTML={{ __html: qr }} />
-              <small>Envie sua foto</small>
-            </div>
-          </aside>
+          )}
+          <div className="fv-demo-qr" data-testid="demo-qr">
+            <span dangerouslySetInnerHTML={{ __html: qr }} />
+            <small>Envie sua foto</small>
+          </div>
         </div>
         <div className="fv-demo-controls">
           <div role="radiogroup" aria-label="Estilo do telão" className="fv-demo-layouts">

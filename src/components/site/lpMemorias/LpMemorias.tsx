@@ -67,8 +67,8 @@ export default function LpMemorias({ whatsapp, email, instagram, sampleQr }: Pro
               <div className="fv-screen-credit">
                 <p>Que festa linda!</p>
                 <small>Marina</small>
-                <span className="fv-screen-qr" dangerouslySetInnerHTML={{ __html: sampleQr }} />
               </div>
+              <span className="fv-screen-qr" dangerouslySetInnerHTML={{ __html: sampleQr }} />
             </div>
             <div className="fv-phone">
               {/* eslint-disable-next-line @next/next/no-img-element */}

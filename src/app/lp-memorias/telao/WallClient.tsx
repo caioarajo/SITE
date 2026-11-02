@@ -29,14 +29,6 @@ function mosaicGrid(count: number): [number, number] {
   return [4, 3];
 }
 
-function Spark({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 0c1 7 4 10 12 12-8 2-11 5-12 12-1-7-4-10-12-12 8-2 11-5 12-12z" />
-    </svg>
-  );
-}
-
 export default function WallClient({ token, initial }: { token: string; initial: WallState }) {
   const { state, online } = useLiveState<WallState>(`/api/memorias/state?t=${token}`, initial, {
     topic: `memorias-${initial.eventId}`,
@@ -239,7 +231,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
 
   return (
     <div ref={rootRef} className={`tl-wall ${cursorIdle ? "tl-wall-nocursor" : ""}`} data-testid="wall">
-      {/* Título, legenda e QR code ficam na coluna lateral: nada pode cobrir as pessoas nas fotos. */}
+      {/* A foto ocupa a tela toda; logo, nome, legenda e QR code ficam pequenos, nos cantos. */}
       {!idle && (
       <div className="tl-stage">
       {layout === "cinema" && (
@@ -325,7 +317,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
                 <motion.figure
                   key={slot.id}
                   className="tl-polaroid"
-                  style={{ left: `${2 + (i % 3) * 33}%`, top: `${6 + (i >= 3 ? 44 : 0)}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
+                  style={{ left: `${1 + (i % 3) * 32}%`, top: `${i >= 3 ? 51 : 11}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
                   initial={{ opacity: 0, scale: 1.7, rotate: 0 }}
                   animate={{ opacity: 1, scale: 1, rotate: (h % 13) - 6 }}
                   exit={{ opacity: 0 }}
@@ -361,16 +353,26 @@ export default function WallClient({ token, initial }: { token: string; initial:
       )}
 
       {!idle && (
-        <aside className="tl-side">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="tl-side-logo" src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
-          <div className="tl-wall-title">
-            <Spark className="tl-wall-spark" />
-            <span className="tl-serif">{settings.title}</span>
+        <>
+          <div className="tl-brand">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-lp-memorias-cream.png" alt="LP Memórias" />
+            <span className="tl-brand-title tl-serif">{settings.title}</span>
           </div>
-          <div className="tl-side-credit">
-            {currentPost && currentPost.kind !== "message" && <Credit post={currentPost} />}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            {currentPost && currentPost.kind !== "message" && (currentPost.caption || currentPost.guestName) && (
+              <motion.div
+                key={currentPost.id}
+                className="tl-note"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Credit post={currentPost} />
+              </motion.div>
+            )}
+          </AnimatePresence>
           {settings.showQr && settings.uploadsOpen && (
             <div className="tl-wall-qr">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -378,7 +380,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
               <span>Envie sua foto</span>
             </div>
           )}
-        </aside>
+        </>
       )}
 
       {!idle && hearts.map((h) => (
