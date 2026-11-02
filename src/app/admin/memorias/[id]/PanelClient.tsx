@@ -22,7 +22,9 @@ const LAYOUTS: { key: WallLayout; label: string; text: string }[] = [
   { key: "polaroid", label: "Polaroid", text: "Fotos caindo em um mural" },
 ];
 
-const formatTime = (ms: number) => new Date(ms).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+// Fuso fixo: o servidor roda em UTC e o texto precisa sair igual no servidor e no navegador.
+const formatTime = (ms: number) =>
+  new Date(ms).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Manaus" });
 const RENDER_STEP = 120;
 const formatMb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1).replace(".", ",")} MB`;
 
