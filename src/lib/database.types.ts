@@ -19,6 +19,129 @@ export type Database = {
   }
   public: {
     Tables: {
+      memorias_events: {
+        Row: {
+          blocked_devices: string[]
+          created_at: string
+          created_by: string | null
+          event_date: string | null
+          guest_token: string
+          id: string
+          retention_until: string | null
+          settings: Json
+          show_now: Json | null
+          wall_token: string
+        }
+        Insert: {
+          blocked_devices?: string[]
+          created_at?: string
+          created_by?: string | null
+          event_date?: string | null
+          guest_token: string
+          id?: string
+          retention_until?: string | null
+          settings: Json
+          show_now?: Json | null
+          wall_token: string
+        }
+        Update: {
+          blocked_devices?: string[]
+          created_at?: string
+          created_by?: string | null
+          event_date?: string | null
+          guest_token?: string
+          id?: string
+          retention_until?: string | null
+          settings?: Json
+          show_now?: Json | null
+          wall_token?: string
+        }
+        Relationships: []
+      }
+      memorias_hearts: {
+        Row: {
+          created_at: string
+          device_id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          post_id?: string
+        }
+        Relationships: []
+      }
+      memorias_posts: {
+        Row: {
+          caption: string
+          client_id: string | null
+          created_at: string
+          device_id: string
+          display_path: string | null
+          event_id: string
+          flagged: boolean
+          guest_name: string
+          hearts: number
+          height: number
+          id: string
+          kind: string
+          mime: string | null
+          original_path: string | null
+          pinned: boolean
+          size_bytes: number
+          status: string
+          thumb_path: string | null
+          width: number
+        }
+        Insert: {
+          caption?: string
+          client_id?: string | null
+          created_at?: string
+          device_id: string
+          display_path?: string | null
+          event_id: string
+          flagged?: boolean
+          guest_name?: string
+          hearts?: number
+          height?: number
+          id?: string
+          kind: string
+          mime?: string | null
+          original_path?: string | null
+          pinned?: boolean
+          size_bytes?: number
+          status?: string
+          thumb_path?: string | null
+          width?: number
+        }
+        Update: {
+          caption?: string
+          client_id?: string | null
+          created_at?: string
+          device_id?: string
+          display_path?: string | null
+          event_id?: string
+          flagged?: boolean
+          guest_name?: string
+          hearts?: number
+          height?: number
+          id?: string
+          kind?: string
+          mime?: string | null
+          original_path?: string | null
+          pinned?: boolean
+          size_bytes?: number
+          status?: string
+          thumb_path?: string | null
+          width?: number
+        }
+        Relationships: []
+      }
       accounts_payable: {
         Row: {
           amount: number

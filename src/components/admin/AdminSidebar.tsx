@@ -53,6 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Site",
     links: [
+      { href: "/admin/memorias", label: "LP Memórias", icon: "image" },
       { href: "/admin/portfolio", label: "Portfólio", icon: "image" },
       { href: "/admin/depoimentos", label: "Depoimentos", icon: "quote" },
       { href: "/admin/servicos", label: "Serviços", icon: "tag" },

@@ -68,6 +68,23 @@ exclusivo de `admin`.
   formulário mas ainda não tem área própria (cai em `/admin/sem-acesso`): este app não
   tem hoje nenhum dado "por cliente" (leads são só formulário de contato, não contas).
 
+## LP Memórias (fotos dos convidados no telão)
+
+Serviço vendido em `/lp-memorias` (com `noindex` e sem link no menu público, por decisão
+do cliente). Operação em `/admin/memorias`; convidados em `/lp-memorias/enviar?t=`; telão em
+`/lp-memorias/telao?t=`. Schema em `supabase/migrations/0017_lp_memorias.sql`.
+
+- **Acesso:** as tabelas `memorias_*` têm RLS ligado e nenhuma policy, de propósito. Tudo passa
+  pelas rotas `api/memorias` (token do link) e `api/admin/memorias` (`requireStaff`), com service role.
+- **Upload:** direto do navegador para o bucket privado `memorias` com URL assinada, porque a
+  Vercel recusa corpos acima de cerca de 4,5 MB. Depois, `upload/finish` valida pelos bytes e gera as versões.
+- **Mídia:** sempre pela rota de redirecionamento: a URL assinada muda a cada chamada, e usá-la
+  direto no estado faria as fotos recarregarem no telão.
+- **Tempo real:** Realtime Broadcast só para telão e painel, com a mensagem "mudou", sem dados.
+  Convidados consultam a cada 15s para não consumir o limite de conexões do plano.
+- **Pendências:** a exclusão ao vencer o prazo de guarda é manual (o painel só avisa). O prazo de
+  1 ano é um padrão provisório, editável por evento, até a Lia definir. Vídeos limitados a 50 MB.
+
 ## Identidade visual (não mexer sem pedido explícito)
 
 Paleta de cores (definida em `:root` no `globals.css`):
