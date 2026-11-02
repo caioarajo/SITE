@@ -69,6 +69,7 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
               <div className="fv-screen-credit">
                 <p>Que festa linda!</p>
                 <small>Marina</small>
+                <span className="fv-screen-qr" dangerouslySetInnerHTML={{ __html: sampleQr }} />
               </div>
             </div>
             <div className="fv-phone">
@@ -166,7 +167,7 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
             <h2 className="serif">Faça o caminho de uma foto, do celular ao telão</h2>
             <p>Esta é uma simulação: nada é enviado nem salvo. Ela mostra como a LP Memórias funciona.</p>
           </Reveal>
-          <LiveDemo />
+          <LiveDemo qr={sampleQr} />
         </div>
       </section>
 
@@ -388,7 +389,7 @@ export default function LpMemorias({ whatsapp, email, instagram, testimonials, s
   );
 }
 
-/** Mesmo login do painel do site principal; aqui leva direto aos eventos da LP Memórias. */
+/** Mesmo visual do botão do site principal. A entrada atende clientes e a equipe do site. */
 function PanelButton() {
   // "unknown" enquanto a sessão não foi checada: evita piscar "Entrar" e trocar para "Painel".
   const [session, setSession] = useState<"unknown" | "out" | "in">("unknown");
@@ -406,7 +407,7 @@ function PanelButton() {
 
   if (session === "unknown") return null;
   return (
-    <a className="btn btn-line fv-panel-btn" href={session === "in" ? "/admin/memorias" : "/admin/login?redirectTo=%2Fadmin%2Fmemorias"}>
+    <a className="btn btn-line fv-panel-btn" href={session === "in" ? "/lp-memorias/conta" : "/lp-memorias/entrar"}>
       {session === "in" ? "Painel" : "Entrar"}
     </a>
   );

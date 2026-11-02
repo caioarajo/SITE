@@ -19,9 +19,46 @@ export type Database = {
   }
   public: {
     Tables: {
+      memorias_clients: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          is_active: boolean
+          must_change_password: boolean
+          name: string
+          notes: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id: string
+          is_active?: boolean
+          must_change_password?: boolean
+          name: string
+          notes?: string
+          phone?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean
+          must_change_password?: boolean
+          name?: string
+          notes?: string
+          phone?: string
+        }
+        Relationships: []
+      }
       memorias_events: {
         Row: {
           blocked_devices: string[]
+          client_id: string | null
           created_at: string
           created_by: string | null
           event_date: string | null
@@ -34,6 +71,7 @@ export type Database = {
         }
         Insert: {
           blocked_devices?: string[]
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           event_date?: string | null
@@ -46,6 +84,7 @@ export type Database = {
         }
         Update: {
           blocked_devices?: string[]
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           event_date?: string | null

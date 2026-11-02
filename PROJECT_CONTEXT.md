@@ -82,6 +82,10 @@ do cliente). Operação em `/admin/memorias`; convidados em `/lp-memorias/enviar
   direto no estado faria as fotos recarregarem no telão.
 - **Tempo real:** Realtime Broadcast só para telão e painel, com a mensagem "mudou", sem dados.
   Convidados consultam a cada 15s para não consumir o limite de conexões do plano.
+- **Clientes (quem contrata):** contas em `memorias_clients`, criadas em `/admin/memorias/clientes`. Usam o Supabase Auth,
+  mas sem linha em `profiles`: é isso que os mantém fora de `/admin` e de `/admin/usuarios`. Entram por `/lp-memorias/entrar`
+  (que também aceita a equipe) e veem só os próprios eventos em `/lp-memorias/conta`. A regra fica em `lib/memorias/access.ts`.
+  Só a equipe cria eventos, vincula cliente, muda o prazo e exclui.
 - **Pendências:** a exclusão ao vencer o prazo de guarda é manual (o painel só avisa). O prazo de
   1 ano é um padrão provisório, editável por evento, até a Lia definir. Vídeos limitados a 50 MB.
 

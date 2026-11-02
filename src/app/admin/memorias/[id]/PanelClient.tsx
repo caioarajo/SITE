@@ -26,12 +26,21 @@ const formatTime = (ms: number) => new Date(ms).toLocaleTimeString("pt-BR", { ho
 const RENDER_STEP = 120;
 const formatMb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1).replace(".", ",")} MB`;
 
-export default function PanelClient({ initial }: { initial: AdminState }) {
+export default function PanelClient({
+  initial,
+  scope,
+  clients = [],
+}: {
+  initial: AdminState;
+  /** "client": quem contratou, sem prazo, vínculo nem exclusão do evento. */
+  scope: "staff" | "client";
+  clients?: { id: string; name: string }[];
+}) {
   const eventId = initial.eventId;
   const api = `/api/admin/memorias/${eventId}`;
   const router = useRouter();
   const { state, online, refresh } = useLiveState<AdminState>(api, initial, { topic: `memorias-${eventId}`, pollMs: 10_000 });
-  const { settings, posts, stats, blockedDevices, guestUrl, wallUrl, eventDate, retentionUntil } = state;
+  const { settings, posts, stats, blockedDevices, guestUrl, wallUrl, eventDate, retentionUntil, clientId } = state;
 
   const [filter, setFilter] = useState<Filter>("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -119,7 +128,7 @@ export default function PanelClient({ initial }: { initial: AdminState }) {
     <main className="tl-panel">
       <header className="tl-panel-head">
         <div>
-          <Link href="/admin/memorias" className="tl-back">← Todos os eventos</Link>
+          <Link href={scope === "staff" ? "/admin/memorias" : "/lp-memorias/conta"} className="tl-back">{scope === "staff" ? "← Todos os eventos" : "← Meus eventos"}</Link>
           <p className="tl-eyebrow">LP Memórias {online ? "· ao vivo" : "· reconectando"}</p>
           <h1 className="tl-serif">{settings.title}</h1>
         </div>
@@ -304,6 +313,7 @@ export default function PanelClient({ initial }: { initial: AdminState }) {
               <button type="button" className="tl-btn" disabled={!!zipProgress} onClick={() => void downloadZip()}>
                 {zipProgress || "Baixar aprovadas (ZIP)"}
               </button>
+              {scope === "staff" && (
               <button
                 type="button"
                 className="tl-btn tl-btn-danger"
@@ -313,8 +323,18 @@ export default function PanelClient({ initial }: { initial: AdminState }) {
               >
                 Excluir evento
               </button>
+              )}
             </div>
-            <label className="tl-field">
+            {scope === "staff" ? (
+              <>
+                <label className="tl-field">
+                  <span>Cliente</span>
+                  <select value={clientId ?? ""} onChange={(e) => void call("assignClient", { clientId: e.target.value })}>
+                    <option value="">Sem cliente vinculado</option>
+                    {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </label>
+                <label className="tl-field">
               <span>Data do evento</span>
               <input type="date" value={eventDate ?? ""} onChange={(e) => void call("dates", { eventDate: e.target.value, retentionUntil })} />
             </label>
@@ -322,7 +342,11 @@ export default function PanelClient({ initial }: { initial: AdminState }) {
               <span>Guardar as fotos até</span>
               <input type="date" value={retentionUntil ?? ""} onChange={(e) => void call("dates", { eventDate, retentionUntil: e.target.value })} />
             </label>
-            {retentionUntil && retentionUntil < new Date().toISOString().slice(0, 10) && (
+              </>
+            ) : (
+              retentionUntil && <p className="tl-hint tl-form-hint">Fotos guardadas até {retentionUntil.split("-").reverse().join("/")}.</p>
+            )}
+            {scope === "staff" && retentionUntil && retentionUntil < new Date().toISOString().slice(0, 10) && (
               <p className="tl-error">O prazo de guarda venceu. Baixe as fotos e exclua o evento.</p>
             )}
           </section>

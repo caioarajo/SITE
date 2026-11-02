@@ -145,6 +145,7 @@ export async function adminState(event: EventRow, origin: string): Promise<Admin
     wallUrl: origin + wallPath(event),
     eventDate: event.event_date,
     retentionUntil: event.retention_until,
+    clientId: event.client_id,
     stats: {
       total: posts.length,
       pending: posts.filter((p) => p.status === "pending").length,
@@ -161,10 +162,14 @@ export async function adminState(event: EventRow, origin: string): Promise<Admin
   };
 }
 
-export async function eventSummaries(): Promise<EventSummary[]> {
+/** Com `clientId`, só os eventos daquele cliente. */
+export async function eventSummaries(clientId?: string): Promise<EventSummary[]> {
   const client = db();
-  const { data: events, error } = await client.from("memorias_events").select("*").order("created_at", { ascending: false });
+  let query = client.from("memorias_events").select("*").order("created_at", { ascending: false });
+  if (clientId) query = query.eq("client_id", clientId);
+  const [{ data: events, error }, { data: clients }] = await Promise.all([query, client.from("memorias_clients").select("id, name")]);
   if (error) throw new Error(error.message);
+  const names = new Map((clients ?? []).map((c) => [c.id, c.name]));
   return Promise.all(
     (events ?? []).map(async (event) => {
       const [total, pending] = await Promise.all([
@@ -180,6 +185,7 @@ export async function eventSummaries(): Promise<EventSummary[]> {
         uploadsOpen: settings.uploadsOpen,
         total: total.count ?? 0,
         pending: pending.count ?? 0,
+        clientName: event.client_id ? names.get(event.client_id) ?? null : null,
       };
     }),
   );

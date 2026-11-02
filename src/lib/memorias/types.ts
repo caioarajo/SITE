@@ -63,6 +63,7 @@ export interface AdminState {
   wallUrl: string;
   eventDate: string | null;
   retentionUntil: string | null;
+  clientId: string | null;
   stats: {
     total: number;
     pending: number;
@@ -83,6 +84,18 @@ export interface EventSummary {
   uploadsOpen: boolean;
   total: number;
   pending: number;
+  clientName: string | null;
+}
+
+export interface ClientSummary {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  notes: string;
+  isActive: boolean;
+  mustChangePassword: boolean;
+  events: { id: string; title: string }[];
 }
 
 export const MAX_IMAGE_BYTES = 25 * 1024 * 1024;

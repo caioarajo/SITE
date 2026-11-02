@@ -239,7 +239,10 @@ export default function WallClient({ token, initial }: { token: string; initial:
 
   return (
     <div ref={rootRef} className={`tl-wall ${cursorIdle ? "tl-wall-nocursor" : ""}`} data-testid="wall">
-      {!idle && layout === "cinema" && (
+      {/* Título, legenda e QR code ficam na coluna lateral: nada pode cobrir as pessoas nas fotos. */}
+      {!idle && (
+      <div className="tl-stage">
+      {layout === "cinema" && (
         <AnimatePresence initial={false}>
           {visible.map(({ post }) => (
             <motion.div
@@ -263,8 +266,9 @@ export default function WallClient({ token, initial }: { token: string; initial:
                       className="tl-cinema-photo"
                       src={mediaUrl(post.id)}
                       alt={post.caption || "Foto de convidado"}
-                      initial={{ scale: 1 }}
-                      animate={{ scale: 1.05 }}
+                      // Termina em 1: o zoom nunca pode passar disso, ou corta cabeça e pés.
+                      initial={{ scale: 0.97 }}
+                      animate={{ scale: 1 }}
                       transition={{ duration: settings.intervalSec + 2, ease: "linear" }}
                     />
                   ) : (
@@ -278,7 +282,6 @@ export default function WallClient({ token, initial }: { token: string; initial:
                       onError={() => onMediaFailed(post.id)}
                     />
                   )}
-                  <Credit post={post} />
                 </>
               )}
             </motion.div>
@@ -286,7 +289,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
         </AnimatePresence>
       )}
 
-      {!idle && layout === "mosaico" && (
+      {layout === "mosaico" && (
         <div
           className="tl-mosaic"
           style={{ gridTemplateColumns: `repeat(${mosaicGrid(visible.length)[0]}, 1fr)`, gridTemplateRows: `repeat(${mosaicGrid(visible.length)[1]}, 1fr)` }}
@@ -299,11 +302,13 @@ export default function WallClient({ token, initial }: { token: string; initial:
             >
               <motion.div
                 className="tl-fill"
-                initial={{ opacity: 0, scale: 1.08 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.9 }}
               >
-                <Tile post={post} src={mediaUrl(post.id)} onFailed={onMediaFailed} />
+                <div className="tl-tile-box">
+                  <Tile post={post} src={mediaUrl(post.id)} onFailed={onMediaFailed} />
+                </div>
                 {post.kind !== "message" && <Credit post={post} compact />}
               </motion.div>
             </div>
@@ -311,7 +316,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
         </div>
       )}
 
-      {!idle && layout === "polaroid" && (
+      {layout === "polaroid" && (
         <div className="tl-board">
           <AnimatePresence>
             {visible.map(({ slot, post }, i) => {
@@ -320,8 +325,7 @@ export default function WallClient({ token, initial }: { token: string; initial:
                 <motion.figure
                   key={slot.id}
                   className="tl-polaroid"
-                  // Com QR code na tela, o mural encolhe para deixar o canto direito livre.
-                  style={{ left: `${settings.showQr && settings.uploadsOpen ? 2 + (i % 3) * 25 : 5 + (i % 3) * 32}%`, top: `${6 + (i >= 3 ? 44 : 0)}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
+                  style={{ left: `${2 + (i % 3) * 33}%`, top: `${6 + (i >= 3 ? 44 : 0)}%`, zIndex: Math.floor(slot.at / 1000) % 100000 }}
                   initial={{ opacity: 0, scale: 1.7, rotate: 0 }}
                   animate={{ opacity: 1, scale: 1, rotate: (h % 13) - 6 }}
                   exit={{ opacity: 0 }}
@@ -336,6 +340,9 @@ export default function WallClient({ token, initial }: { token: string; initial:
             })}
           </AnimatePresence>
         </div>
+      )}
+
+      </div>
       )}
 
       {idle && (
@@ -353,18 +360,22 @@ export default function WallClient({ token, initial }: { token: string; initial:
       )}
 
       {!idle && (
-        <div className="tl-wall-title">
-          <Spark className="tl-wall-spark" />
-          <span className="tl-serif">{settings.title}</span>
-        </div>
-      )}
-
-      {!idle && settings.showQr && settings.uploadsOpen && (
-        <div className="tl-wall-qr">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={qrUrl} alt="QR code para enviar fotos" />
-          <span>Envie sua foto</span>
-        </div>
+        <aside className="tl-side">
+          <div className="tl-wall-title">
+            <Spark className="tl-wall-spark" />
+            <span className="tl-serif">{settings.title}</span>
+          </div>
+          <div className="tl-side-credit">
+            {currentPost && currentPost.kind !== "message" && <Credit post={currentPost} />}
+          </div>
+          {settings.showQr && settings.uploadsOpen && (
+            <div className="tl-wall-qr">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={qrUrl} alt="QR code para enviar fotos" />
+              <span>Envie sua foto</span>
+            </div>
+          )}
+        </aside>
       )}
 
       {!idle && hearts.map((h) => (
@@ -407,6 +418,13 @@ function Tile({ post, src, onFailed }: { post: Post; src: string; onFailed: (id:
   if (post.kind === "video") {
     return <video className="tl-tile" src={src} autoPlay muted loop playsInline onError={() => onFailed(post.id)} />;
   }
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img className="tl-tile" src={src} alt={post.caption || "Foto de convidado"} />;
+  // A foto aparece inteira; a sobra do quadro é preenchida com ela mesma, desfocada.
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="tl-tile-bg" src={src} alt="" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="tl-tile" src={src} alt={post.caption || "Foto de convidado"} />
+    </>
+  );
 }

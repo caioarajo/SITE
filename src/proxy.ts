@@ -17,14 +17,18 @@ export async function proxy(request: NextRequest) {
   }
 
   // Se já está logado e tenta acessar /admin/login, manda direto pro painel.
-  if (isLoginRoute && user) {
+  // Só com perfil ativo: cliente da LP Memórias não tem perfil e entraria em ciclo de redirecionamento.
+  if (isLoginRoute && user && profile?.is_active) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
   if (isAdminRoute && !isLoginRoute && user) {
     // Conta desativada: o token pode ainda não ter expirado, mas a linha em
     // profiles (ou o ban_duration setado pela API de usuários) já bloqueia.
-    if (!profile || !profile.is_active) {
+    // Conta de cliente da LP Memórias não tem perfil: volta para a área dela.
+    if (!profile) return NextResponse.redirect(new URL("/lp-memorias/conta", request.url));
+
+    if (!profile.is_active) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("error", "conta_desativada");
       return NextResponse.redirect(loginUrl);
@@ -55,5 +59,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
+    // Mantém a sessão renovada na área do cliente da LP Memórias.
+    "/lp-memorias/conta/:path*",
   ],
 };

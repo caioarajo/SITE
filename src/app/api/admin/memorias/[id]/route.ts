@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { requireStaff } from "@/lib/supabase/admin-guard";
-import { adminState, BUCKET, eventById, newToken, notifyChanged, pathsOf, removeEventFiles, settingsOf } from "@/lib/memorias/server";
+import { requireEventAccess } from "@/lib/memorias/access";
+import { adminState, BUCKET, newToken, notifyChanged, pathsOf, removeEventFiles, settingsOf } from "@/lib/memorias/server";
 import type { WallSettings } from "@/lib/memorias/types";
 import type { Database, Json } from "@/lib/database.types";
 
@@ -23,19 +23,16 @@ function sanitizeSettings(patch: Partial<WallSettings>): Partial<WallSettings> {
 }
 
 export async function GET(request: NextRequest, { params }: Params) {
-  const guard = await requireStaff();
-  if ("error" in guard) return guard.error;
-  const event = await eventById((await params).id);
-  if (!event) return NextResponse.json({ error: "Evento não encontrado." }, { status: 404 });
-  return NextResponse.json(await adminState(event, request.nextUrl.origin));
+  const access = await requireEventAccess((await params).id);
+  if ("error" in access) return access.error;
+  return NextResponse.json(await adminState(access.event, request.nextUrl.origin));
 }
 
 export async function POST(request: NextRequest, { params }: Params) {
-  const guard = await requireStaff();
-  if ("error" in guard) return guard.error;
-  const client = guard.serviceClient;
-  const event = await eventById((await params).id);
-  if (!event) return NextResponse.json({ error: "Evento não encontrado." }, { status: 404 });
+  const access = await requireEventAccess((await params).id);
+  if ("error" in access) return access.error;
+  const { event, account } = access;
+  const client = access.serviceClient;
 
   const body = (await request.json().catch(() => ({}))) as {
     action?: string;
@@ -45,7 +42,12 @@ export async function POST(request: NextRequest, { params }: Params) {
     settings?: Partial<WallSettings>;
     eventDate?: string | null;
     retentionUntil?: string | null;
+    clientId?: string | null;
   };
+  // O cliente modera o próprio evento; prazo, vínculo e exclusão ficam com a equipe.
+  if (account.kind === "client" && ["dates", "assignClient", "deleteEvent"].includes(String(body.action))) {
+    return NextResponse.json({ error: "Fale com a equipe da LP para esta alteração." }, { status: 403 });
+  }
   const ids = body.ids ?? (body.id ? [body.id] : []);
   const posts = () => client.from("memorias_posts");
   const updateEvent = (patch: Database["public"]["Tables"]["memorias_events"]["Update"]) =>
@@ -97,6 +99,15 @@ export async function POST(request: NextRequest, { params }: Params) {
     case "dates":
       await updateEvent({ event_date: body.eventDate || null, retention_until: body.retentionUntil || null });
       break;
+    case "assignClient": {
+      const clientId = body.clientId || null;
+      if (clientId) {
+        const { data: owner } = await client.from("memorias_clients").select("id").eq("id", clientId).maybeSingle();
+        if (!owner) return NextResponse.json({ error: "Cliente não encontrado." }, { status: 404 });
+      }
+      await updateEvent({ client_id: clientId });
+      break;
+    }
     case "rotateGuestToken":
       await updateEvent({ guest_token: newToken() });
       break;

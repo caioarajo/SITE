@@ -14,7 +14,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const guard = await requireStaff();
   if ("error" in guard) return guard.error;
-  const body = (await request.json().catch(() => ({}))) as { title?: string; eventDate?: string; retentionUntil?: string };
+  const body = (await request.json().catch(() => ({}))) as { title?: string; eventDate?: string; retentionUntil?: string; clientId?: string };
   const title = String(body.title ?? "").trim().slice(0, 80);
   if (!title) return NextResponse.json({ error: "Informe o nome do evento." }, { status: 400 });
 
@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
       settings: { ...DEFAULT_SETTINGS, title } as unknown as Json,
       event_date: body.eventDate || null,
       retention_until: body.retentionUntil || null,
+      client_id: body.clientId || null,
       created_by: guard.user.id,
     })
     .select("id")

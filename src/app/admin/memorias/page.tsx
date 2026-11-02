@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
-import type { EventSummary } from "@/lib/memorias/types";
+import type { ClientSummary, EventSummary } from "@/lib/memorias/types";
+import MemoriasNav from "./MemoriasNav";
 import "@/app/lp-memorias/memorias-app.css";
 
 const inAYear = () => {
@@ -16,6 +17,8 @@ const formatDate = (iso: string | null) => (iso ? iso.split("-").reverse().join(
 export default function MemoriasEventosPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventSummary[] | null>(null);
+  const [clients, setClients] = useState<ClientSummary[]>([]);
+  const [clientId, setClientId] = useState("");
   const [title, setTitle] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [retentionUntil, setRetentionUntil] = useState(inAYear);
@@ -33,6 +36,10 @@ export default function MemoriasEventosPage() {
         setEvents([]);
         setError(err.message);
       });
+    fetch("/api/admin/memorias/clients")
+      .then((res) => res.json())
+      .then((data: { clients?: ClientSummary[] }) => setClients(data.clients ?? []))
+      .catch(() => {});
   }, []);
 
   const create = async (e: FormEvent) => {
@@ -42,7 +49,7 @@ export default function MemoriasEventosPage() {
     const res = await fetch("/api/admin/memorias", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, eventDate, retentionUntil }),
+      body: JSON.stringify({ title, eventDate, retentionUntil, clientId }),
     });
     const data = (await res.json()) as { id?: string; error?: string };
     if (!res.ok || !data.id) {
@@ -57,6 +64,7 @@ export default function MemoriasEventosPage() {
     <div className="tl-root tl-panel">
       <p className="tl-eyebrow">LP Memórias</p>
       <h1 className="tl-serif tl-list-title">Eventos</h1>
+      <MemoriasNav />
       {error && <p className="tl-error tl-panel-error" role="alert">{error}</p>}
 
       <div className="tl-panel-grid">
@@ -72,9 +80,10 @@ export default function MemoriasEventosPage() {
                   <Link href={`/admin/memorias/${event.id}`}>
                     <strong>{event.title}</strong>
                     <span>
-                      {formatDate(event.eventDate)} · {event.total} publicações
-                      {event.pending > 0 && ` · ${event.pending} pendentes`}
+                      {formatDate(event.eventDate)} · {event.total} {event.total === 1 ? "publicação" : "publicações"}
+                      {event.pending > 0 && ` · ${event.pending} ${event.pending === 1 ? "pendente" : "pendentes"}`}
                       {!event.uploadsOpen && " · envios encerrados"}
+                      {event.clientName && ` · ${event.clientName}`}
                     </span>
                   </Link>
                 </li>
@@ -96,6 +105,13 @@ export default function MemoriasEventosPage() {
           <label className="tl-field">
             <span>Guardar as fotos até</span>
             <input type="date" value={retentionUntil} onChange={(e) => setRetentionUntil(e.target.value)} />
+          </label>
+          <label className="tl-field">
+            <span>Cliente (opcional)</span>
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)}>
+              <option value="">Sem cliente vinculado</option>
+              {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
           </label>
           <div className="tl-row-wrap">
             <button type="submit" className="tl-btn tl-btn-primary" disabled={saving}>{saving ? "Criando…" : "Criar evento"}</button>

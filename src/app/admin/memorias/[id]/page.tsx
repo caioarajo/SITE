@@ -13,13 +13,15 @@ export default async function MemoriasPainelPage({ params }: { params: Promise<{
   const event = await eventById((await params).id);
   if (!event) notFound();
 
+  const { data: clients } = await guard.serviceClient.from("memorias_clients").select("id, name").order("name");
+
   const headerList = await headers();
   const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "";
   const protocol = headerList.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
 
   return (
     <div className="tl-root">
-      <PanelClient initial={await adminState(event, `${protocol}://${host}`)} />
+      <PanelClient initial={await adminState(event, `${protocol}://${host}`)} scope="staff" clients={clients ?? []} />
     </div>
   );
 }

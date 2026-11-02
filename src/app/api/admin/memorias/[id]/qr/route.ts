@@ -1,16 +1,15 @@
 import QRCode from "qrcode";
 import { NextResponse, type NextRequest } from "next/server";
-import { requireStaff } from "@/lib/supabase/admin-guard";
-import { eventById, guestPath } from "@/lib/memorias/server";
+import { requireEventAccess } from "@/lib/memorias/access";
+import { guestPath } from "@/lib/memorias/server";
 
 export const dynamic = "force-dynamic";
 
 /** QR code do link do convidado, para o painel e para impressão (PNG ou SVG). */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireStaff();
-  if ("error" in guard) return guard.error;
-  const event = await eventById((await params).id);
-  if (!event) return new NextResponse(null, { status: 404 });
+  const access = await requireEventAccess((await params).id);
+  if ("error" in access) return access.error;
+  const { event } = access;
 
   const { searchParams, origin } = request.nextUrl;
   const url = origin + guestPath(event);
