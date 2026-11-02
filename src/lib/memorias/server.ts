@@ -209,16 +209,15 @@ export async function removeEventFiles(eventId: string) {
 
 /** Avisa telão e painel pelo Realtime Broadcast. O canal só diz "mudou", sem nenhum dado. */
 export async function notifyChanged(eventId: string) {
+  // httpSend, e não um fetch manual: as chaves novas (sb_secret_) não aceitam Authorization: Bearer.
+  const client = db();
+  const channel = client.channel(`memorias-${eventId}`);
   try {
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
-    await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/realtime/v1/api/broadcast`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ messages: [{ topic: `memorias-${eventId}`, event: "changed", payload: {} }] }),
-      signal: AbortSignal.timeout(2500),
-    });
+    await channel.httpSend("changed", {}, { timeout: 2500 });
   } catch (err) {
     // A consulta periódica do telão e do painel cobre uma falha aqui.
     console.error("[memorias] broadcast", err);
+  } finally {
+    await client.removeChannel(channel);
   }
 }
