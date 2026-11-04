@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lpcerimonial.com.br"),
   // Sem imagem própria, o WhatsApp e outros apps ampliam o favicon até ocupar o cartão inteiro.
   openGraph: {
-    images: [{ url: "/og-lp.jpg", width: 1200, height: 630, alt: "LP Assessoria e Cerimonial" }],
+    images: [{ url: "/og-lp-assessoria.jpg", width: 1200, height: 630, alt: "LP Assessoria e Cerimonial" }],
   },
   title: "LP Assessoria e Cerimonial | Lia Pontes",
   description:
