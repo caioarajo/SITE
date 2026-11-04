@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { changePassword, currentUser, requestPasswordReset, setNewPassword, signIn, signOut, signUp } from "@/lib/casar/auth";
+import { changePassword, confirmEmail, currentUser, requestPasswordReset, setNewPassword, signIn, signOut, signUp } from "@/lib/casar/auth";
 import { siteByOwner } from "@/lib/casar/store";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     password?: string;
     current?: string;
     token?: string;
+    tokenHash?: string;
     terms?: boolean;
     marketing?: boolean;
   };
@@ -18,6 +19,11 @@ export async function POST(request: NextRequest) {
   if (body.action === "logout") {
     await signOut();
     return NextResponse.json({ ok: true });
+  }
+
+  if (body.action === "confirm") {
+    const result = await confirmEmail(String(body.tokenHash ?? ""));
+    return result.error ? NextResponse.json({ error: result.error }, { status: 400 }) : NextResponse.json({ ok: true });
   }
 
   const email = String(body.email ?? "").trim().toLowerCase();
@@ -35,7 +41,7 @@ export async function POST(request: NextRequest) {
   if (body.action === "reset" || body.action === "change") {
     let done;
     if (body.action === "reset") {
-      done = await setNewPassword(password, body.token);
+      done = await setNewPassword(password, body.token, body.tokenHash);
     } else {
       const user = await currentUser();
       if (!user) return NextResponse.json({ error: "Faça login para continuar." }, { status: 401 });

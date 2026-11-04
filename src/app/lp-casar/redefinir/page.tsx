@@ -4,7 +4,7 @@ import "../lp-casar.css";
 
 export const metadata: Metadata = { title: "Nova senha | LP Casar", robots: { index: false, follow: false } };
 
-export default async function RedefinirPage({ searchParams }: { searchParams: Promise<{ token?: string; erro?: string }> }) {
-  const { token, erro } = await searchParams;
-  return <ResetPassword token={token} expired={Boolean(erro)} />;
+export default async function RedefinirPage({ searchParams }: { searchParams: Promise<{ token?: string; token_hash?: string; erro?: string }> }) {
+  const { token, token_hash: tokenHash, erro } = await searchParams;
+  return <ResetPassword token={token} tokenHash={tokenHash} expired={Boolean(erro)} />;
 }

@@ -471,6 +471,7 @@
 .lc-phone-preview .ls-nav,.ls-nav{scrollbar-width:none;}
 .lc-check{display:flex; gap:10px; align-items:flex-start; margin-top:12px; font-size:14px; line-height:1.4; cursor:pointer;}
 .lc-check input{width:18px; height:18px; flex:none; margin-top:1px; accent-color:var(--navy);}
+.lc-auth-note{text-align:center;}
 .lc-terms{max-width:760px; margin:0 auto; padding:40px 20px 64px;}
 .lc-terms h1{font-family:'Playfair Display', serif; font-style:italic; font-size:36px; margin:28px 0 8px;}
 .lc-terms h2{font-size:19px; font-weight:500; margin:24px 0 6px;}

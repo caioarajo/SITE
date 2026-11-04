@@ -17,7 +17,7 @@ export const LOCAL_DIR = path.join(process.cwd(), ".data", "lp-casar");
 
 export type Site = { id: string; ownerId: string; slug: string; data: SiteData; views: number };
 
-export const RESERVED_SLUGS = new Set(["entrar", "encontrar", "criar", "painel", "redefinir", "termos", "api", "admin", "lp-casar"]);
+export const RESERVED_SLUGS = new Set(["entrar", "encontrar", "criar", "painel", "redefinir", "confirmar", "termos", "api", "admin", "lp-casar"]);
 
 type LocalRecord = { id: string; siteId: string; kind: RecordKind; createdAt: string; data: unknown };
 type LocalSite = { id: string; ownerId: string; slug: string; data: unknown; views?: number };

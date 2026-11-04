@@ -91,8 +91,12 @@ export async function requestPasswordReset(email: string, origin: string): Promi
   return {};
 }
 
-/** Quem chega aqui já provou o acesso ao e-mail: pelo token local ou pela sessão criada no callback. */
-export async function setNewPassword(password: string, token?: string): Promise<AuthResult> {
+/**
+ * Quem chega aqui provou o acesso ao e-mail: pelo token local, pelo token do link ou pela sessão criada no callback.
+ * O token do link só é gasto neste envio de formulário: o scanner do Outlook/Hotmail abre os links
+ * antes de entregar a mensagem, e um link que consome o token ao abrir chega já vencido.
+ */
+export async function setNewPassword(password: string, token?: string, tokenHash?: string): Promise<AuthResult> {
   if (LOCAL_MODE) {
     const db = readLocal();
     const reset = token ? db.resets?.[token] : undefined;
@@ -105,8 +109,20 @@ export async function setNewPassword(password: string, token?: string): Promise<
     return {};
   }
   const supabase = await createClient();
+  if (tokenHash) {
+    const verified = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+    if (verified.error) return { error: "Este link expirou ou já foi usado. Peça um novo." };
+  }
   const { error } = await supabase.auth.updateUser({ password });
-  return error ? { error: "Este link expirou ou a senha é fraca. Peça um novo link." } : {};
+  return error ? { error: "Não foi possível salvar. Use uma senha mais forte ou peça um novo link." } : {};
+}
+
+/** Confirma o cadastro só quando a pessoa clica no botão da página: ver a nota em setNewPassword. */
+export async function confirmEmail(tokenHash: string): Promise<AuthResult> {
+  if (LOCAL_MODE) return {};
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "signup" });
+  return error ? { error: "Este link expirou ou já foi usado. Tente entrar com seu e-mail e senha." } : {};
 }
 
 export async function changePassword(email: string, current: string, next: string): Promise<AuthResult> {
