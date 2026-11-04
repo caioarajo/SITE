@@ -3,6 +3,11 @@ import { MotionConfig } from "framer-motion";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://lpcerimonial.com.br"),
+  // Sem imagem própria, o WhatsApp e outros apps ampliam o favicon até ocupar o cartão inteiro.
+  openGraph: {
+    images: [{ url: "/og-lp.jpg", width: 1200, height: 630, alt: "LP Assessoria e Cerimonial" }],
+  },
   title: "LP Assessoria e Cerimonial | Lia Pontes",
   description:
     "Cerimonialista e assessora de eventos em Manaus. Casamentos, 15 anos, formaturas e eventos em geral, com mais de 15 anos de experiência.",
