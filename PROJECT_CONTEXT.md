@@ -89,6 +89,25 @@ do cliente). Operação em `/admin/memorias`; convidados em `/lp-memorias/enviar
 - **Pendências:** a exclusão ao vencer o prazo de guarda é manual (o painel só avisa). O prazo de
   1 ano é um padrão provisório, editável por evento, até a Lia definir. Vídeos limitados a 50 MB.
 
+## LP Casar (site de casamento feito pelos noivos)
+
+Inspirado no fluxo do Casar.com, com textos, temas e artes próprios e as cores da LP. Fica em `/lp-casar`, com `noindex` e
+sem link no menu público. Noivos entram em `/lp-casar/entrar`, criam o site em `/lp-casar/criar`, editam em `/lp-casar/painel`;
+convidados abrem `/lp-casar/[slug]`. Schema em `supabase/migrations/0019_lp_casar.sql`.
+
+- **Acesso:** `casar_*` com RLS ligado e sem policy, como na LP Memórias. Tudo passa por `api/casar`, que confere o dono
+  (`requireOwnSite`) ou a senha do site. Contas de noivos usam o Supabase Auth, sem linha em `profiles`, e por isso não alcançam `/admin`.
+- **Modo local:** com `LP_CASAR_LOCAL=1` em `next dev`, dados e contas ficam em `.data/lp-casar` (fora do git) e o Supabase não é usado.
+  Em produção a variável é ignorada. Sem ela, o módulo só funciona depois de aplicar a migration 0019.
+- **Presentes:** Pix direto na chave dos noivos (`lib/casar/pix.ts` gera o BR Code). O LP Casar não recebe nem repassa dinheiro, então
+  não confirma pagamento: o aviso do convidado fica "a conferir" até os noivos marcarem como recebido. A "Carteira" é um controle, não um saldo.
+- **Chave Pix:** nunca vai para o navegador do convidado como dado do site (`toPublicData`); só aparece dentro do QR, no momento do presente.
+- **Fontes:** `@import` com vírgula na URL é descartado pelo compilador sem aviso; usar `%2C`. Ver `lp-casar.css`.
+- **Redefinir senha (Supabase):** o e-mail aponta para `/api/casar/auth/callback`, que precisa estar nas Redirect URLs do projeto Supabase.
+- **E-mails:** só saem com `RESEND_API_KEY` e `LP_CASAR_EMAIL_FROM` configurados. Sem isso, os avisos ficam só no painel (números nos menus).
+- **Fora de propósito:** cartão, boleto, saldo real, taxas, shopping/cashback, cartão postal físico e venda de domínio pelo site dependem de contrato com intermediador, gráfica ou registrador. Não simular esses recursos.
+- **Pendências:** sem limite de envios por IP nos formulários públicos (só campo invisível e teto por site). Texto dos termos precisa de revisão jurídica. Backend Supabase ainda não testado de ponta a ponta. Definir preço do serviço antes de divulgar.
+
 ## Identidade visual (não mexer sem pedido explícito)
 
 Paleta de cores (definida em `:root` no `globals.css`):

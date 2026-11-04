@@ -61,5 +61,9 @@ export const config = {
     "/admin/:path*",
     // Mantém a sessão renovada na área do cliente da LP Memórias.
     "/lp-memorias/conta/:path*",
+    // Idem na área dos noivos da LP Casar.
+    "/lp-casar/criar",
+    "/lp-casar/painel",
+    "/lp-casar/redefinir",
   ],
 };

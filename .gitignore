@@ -33,3 +33,6 @@ supabase/.temp
 # claude code (config local, não versionar)
 .claude/
 
+
+# dados locais da LP Casar (LP_CASAR_LOCAL=1)
+/.data/
