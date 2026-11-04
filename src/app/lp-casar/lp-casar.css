@@ -68,9 +68,10 @@
 .lc-toggle input:focus-visible + i{outline:2px solid var(--gold); outline-offset:2px;}
 
 /* ------- Tela dividida: entrada e assistente ------- */
-.lc-split{display:grid; grid-template-columns:minmax(0, 41%) minmax(0, 1fr); position:relative;}
+/* A largura acompanha a altura da tela: as fotos são verticais e, num painel largo, perdem as cabeças no corte. */
+.lc-split{display:grid; grid-template-columns:min(41%, 68vh) minmax(0, 1fr); position:relative;}
 .lc-split-art{height:100vh; position:sticky; top:0; padding-top:10px; overflow:hidden;}
-.lc-split-art img{width:100%; height:100%; object-fit:cover; border-radius:0 170px 170px 0;}
+.lc-split-art img{width:100%; height:100%; object-fit:cover; object-position:center top; border-radius:0 170px 170px 0;}
 .lc-split-body{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:48px 24px; min-height:100vh;}
 .lc-progress{position:fixed; inset:0 0 auto 0; height:10px; background:var(--cream-alt); z-index:5;}
 .lc-progress i{display:block; height:100%; background:var(--gold); transition:width .4s var(--ease);}
