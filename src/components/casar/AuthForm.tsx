@@ -75,9 +75,12 @@ export default function AuthForm({ initialMode }: { initialMode: "login" | "sign
         <Logo />
         {confirmEmail ? (
           <div className="lc-step-box" role="status">
-            <h1>Confirme seu e-mail</h1>
-            <p>Enviamos um link para <strong>{email}</strong>. Depois de confirmar, volte aqui e entre para criar o site de vocês.</p>
-            <button type="button" className="lc-btn" onClick={() => { setConfirmEmail(false); switchMode("login"); }}>Já confirmei</button>
+            <h1>Falta confirmar o e-mail</h1>
+            {/* O Supabase não avisa quando o e-mail já tem conta, de propósito: a tela precisa valer para os dois casos. */}
+            <p>Se <strong>{email}</strong> ainda não tiver cadastro, enviamos um link de confirmação. Confira também a caixa de spam.</p>
+            <p>Se este e-mail já tiver conta, nenhuma mensagem é enviada: entre com a senha ou redefina.</p>
+            <button type="button" className="lc-btn" onClick={() => { setConfirmEmail(false); switchMode("login"); }}>Ir para entrar</button>
+            <button type="button" className="lc-text-btn" onClick={() => { setConfirmEmail(false); switchMode("forgot"); }}>Esqueci minha senha</button>
           </div>
         ) : (
           <form className="lc-auth" onSubmit={(e) => void submit(e)}>
