@@ -44,7 +44,7 @@ export default function ChangePasswordPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <img src="/logo-icon-navy.png" alt="LP" className="logo" />
+        <img src="/logo-icon-navy.svg" alt="LP" className="logo" />
         <h1>Troca de senha obrigatória</h1>
         <p className="sub">Defina uma nova senha para continuar acessando o painel</p>
 

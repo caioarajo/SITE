@@ -37,7 +37,7 @@ export default async function HomePage() {
   return (
     <>
       <IconSprite />
-      <Header logoCreamSrc="/logo-full-cream.png" logoNavySrc="/logo-full-navy.png" />
+      <Header logoCreamSrc="/logo-full-cream.svg" logoNavySrc="/logo-full-navy.svg" />
 
       <main id="top">
         <Hero heroPhotoSrc="/images/hero-couple.jpg" whatsappNumber={settings.whatsapp} />
@@ -61,7 +61,7 @@ export default async function HomePage() {
       </main>
 
       <Footer
-        logoCreamSrc="/logo-full-cream.png"
+        logoCreamSrc="/logo-full-cream.svg"
         settings={{
           whatsapp: settings.whatsapp,
           email: settings.email,

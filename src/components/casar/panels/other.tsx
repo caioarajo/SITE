@@ -175,162 +175,80 @@ export function FaqPanel() {
   );
 }
 
-// ------- Papelaria: modelos desenhados no canvas, sem imagens externas -------
+// ------- Papelaria: fundos em public/images/casar/papelaria (fontes editáveis em design/papelaria) -------
 
-type Ornament = "flowers" | "waves" | "shells" | "leaves" | "lines" | "wash" | "arch";
-type Template = { name: string; bg: string; ink: string; accent: string; ornament: Ornament; script: boolean };
+type Template = {
+  id: string;
+  name: string;
+  ink: string;
+  accent: string;
+  /** Fonte e tamanho dos nomes. */
+  nameFont: string;
+  nameSize: number;
+  /** Deslocamento vertical do bloco de texto, para fugir da arte. */
+  dy?: number;
+  maxWidth?: number;
+  left?: boolean;
+};
+
+const SCRIPT_FONT = "'Great Vibes', cursive";
+const SERIF_FONT = "'Playfair Display', serif";
+const CAPS_FONT = "'Cinzel', serif";
+const SOFT_FONT = "'Cormorant Garamond', serif";
+const BODY_FONT = "'Jost', sans-serif";
 
 const TEMPLATES: Template[] = [
-  { name: "Florada", bg: "#f7f6fb", ink: "#3f3a78", accent: "#8f7fc9", ornament: "flowers", script: true },
-  { name: "Maré Poente", bg: "#fbf0ea", ink: "#a8422a", accent: "#e2997f", ornament: "waves", script: false },
-  { name: "Maré Verde", bg: "#eef6f0", ink: "#1f5e45", accent: "#83b89b", ornament: "waves", script: false },
-  { name: "Conchas", bg: "#eef5f6", ink: "#2c5660", accent: "#88b3bc", ornament: "shells", script: false },
-  { name: "Flor Noturna", bg: "#1a1c2c", ink: "#f0e8d8", accent: "#c9a86a", ornament: "flowers", script: true },
-  { name: "Campo", bg: "#f6f0e4", ink: "#5a4426", accent: "#a98a57", ornament: "leaves", script: true },
-  { name: "Pétala Clara", bg: "#ffffff", ink: "#7a5560", accent: "#dcb6c0", ornament: "flowers", script: true },
-  { name: "Requinte", bg: "#fdfaf3", ink: "#6b5222", accent: "#c0a15c", ornament: "arch", script: true },
-  { name: "Litoral", bg: "#f2f7fb", ink: "#1f4a73", accent: "#8bb2d3", ornament: "shells", script: true },
-  { name: "Clássico", bg: "#ffffff", ink: "#182c52", accent: "#ab7f3f", ornament: "lines", script: false },
-  { name: "Rústico", bg: "#efe6d6", ink: "#4d3a24", accent: "#8c7350", ornament: "leaves", script: false },
-  { name: "Romântico", bg: "#fdf3f3", ink: "#8e3b52", accent: "#e0a3b2", ornament: "arch", script: true },
-  { name: "Moderno", bg: "#ffffff", ink: "#161616", accent: "#161616", ornament: "lines", script: false },
-  { name: "Aquarela", bg: "#fbfafb", ink: "#3f5b78", accent: "#a9c4dd", ornament: "wash", script: true },
+  { id: "florada", name: "Florada", ink: "#3f3a78", accent: "#8f7fc9", nameFont: SCRIPT_FONT, nameSize: 128 },
+  { id: "mare-poente", name: "Maré Poente", ink: "#8f3a24", accent: "#d9775a", nameFont: SERIF_FONT, nameSize: 96 },
+  { id: "mare-verde", name: "Maré Verde", ink: "#1f5e45", accent: "#3f9a7a", nameFont: SERIF_FONT, nameSize: 96 },
+  { id: "conchas", name: "Conchas", ink: "#24505d", accent: "#4a8596", nameFont: SOFT_FONT, nameSize: 108 },
+  { id: "flor-noturna", name: "Flor Noturna", ink: "#f4ecdc", accent: "#d9bd7c", nameFont: SCRIPT_FONT, nameSize: 128 },
+  { id: "campo", name: "Campo", ink: "#4d3a1f", accent: "#8c7350", nameFont: SCRIPT_FONT, nameSize: 124 },
+  { id: "petala-clara", name: "Pétala Clara", ink: "#7a4556", accent: "#d68ea0", nameFont: SCRIPT_FONT, nameSize: 124, dy: 70 },
+  { id: "requinte", name: "Requinte", ink: "#5f4818", accent: "#b08d41", nameFont: CAPS_FONT, nameSize: 74, maxWidth: 700 },
+  { id: "litoral", name: "Litoral", ink: "#1f4a73", accent: "#5d90bd", nameFont: SCRIPT_FONT, nameSize: 124 },
+  { id: "classico", name: "Clássico", ink: "#182c52", accent: "#ab7f3f", nameFont: SERIF_FONT, nameSize: 90, dy: 30, maxWidth: 720 },
+  { id: "rustico", name: "Rústico", ink: "#433620", accent: "#6f8a77", nameFont: SOFT_FONT, nameSize: 96, maxWidth: 560 },
+  { id: "romantico", name: "Romântico", ink: "#8e3b52", accent: "#d68ea0", nameFont: SCRIPT_FONT, nameSize: 120, dy: 90, maxWidth: 620 },
+  { id: "moderno", name: "Moderno", ink: "#161616", accent: "#c79a6b", nameFont: "'Montserrat', sans-serif", nameSize: 72, dy: 10, maxWidth: 780, left: true },
+  { id: "aquarela", name: "Aquarela", ink: "#34506d", accent: "#a9812f", nameFont: SCRIPT_FONT, nameSize: 120, maxWidth: 640 },
 ];
 
 type Kind = "save-the-date" | "invite" | "notice";
 type CardText = { heading: string; quote: string; names: string; line1: string; line2: string; line3: string };
 
-const SIZE = { width: 1400, height: 1000 };
-const SCRIPT_FONT = "'Great Vibes', cursive";
-const SERIF_FONT = "'Playfair Display', serif";
-const BODY_FONT = "'Jost', sans-serif";
+const SIZE = { width: 1080, height: 1350 };
+const artUrl = (template: Template) => `/images/casar/papelaria/${template.id}.jpg`;
 
-function ornament(ctx: CanvasRenderingContext2D, t: Template) {
-  const { width: W, height: H } = SIZE;
-  ctx.save();
-  ctx.strokeStyle = t.accent;
-  ctx.fillStyle = t.accent;
-  ctx.lineWidth = 3;
-  const flower = (x: number, y: number, r: number) => {
-    ctx.globalAlpha = 0.55;
-    for (let i = 0; i < 6; i++) {
-      const a = (i * Math.PI) / 3;
-      ctx.beginPath();
-      ctx.ellipse(x + Math.cos(a) * r, y + Math.sin(a) * r, r * 0.8, r * 0.45, a, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    ctx.beginPath();
-    ctx.arc(x, y, r * 0.35, 0, Math.PI * 2);
-    ctx.fillStyle = t.ink;
-    ctx.fill();
-    ctx.fillStyle = t.accent;
-  };
-  const leaf = (x: number, y: number, angle: number, size: number) => {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.quadraticCurveTo(size / 2, -size / 3, size, 0);
-    ctx.quadraticCurveTo(size / 2, size / 3, 0, 0);
-    ctx.stroke();
-    ctx.restore();
-  };
-  switch (t.ornament) {
-    case "flowers":
-      [[90, 90, 34], [190, 60, 22], [60, 190, 22], [W - 90, H - 90, 34], [W - 190, H - 60, 22], [W - 60, H - 190, 22], [W - 90, 90, 26], [90, H - 90, 26]].forEach(([x, y, r]) => flower(x, y, r));
-      break;
-    case "waves":
-      for (let row = 0; row < 5; row++) {
-        ctx.globalAlpha = 0.5 - row * 0.08;
-        ctx.beginPath();
-        for (let x = 0; x <= W; x += 20) {
-          const y = H - 30 - row * 26 + Math.sin(x / 70 + row) * 14;
-          if (x) ctx.lineTo(x, y);
-          else ctx.moveTo(x, y);
-        }
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-      break;
-    case "shells":
-      [[W - 130, H - 130], [130, 130]].forEach(([x, y]) => {
-        for (let i = 0; i < 7; i++) {
-          const a = Math.PI + (i * Math.PI) / 6;
-          ctx.beginPath();
-          ctx.moveTo(x, y + 50);
-          ctx.quadraticCurveTo(x + Math.cos(a) * 50, y + Math.sin(a) * 50, x + Math.cos(a) * 90, y + Math.sin(a) * 90);
-          ctx.stroke();
-        }
-      });
-      break;
-    case "leaves":
-      [[70, H - 70, -0.8], [W - 70, 70, 2.35]].forEach(([x, y, a]) => {
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + Math.cos(a) * 340, y + Math.sin(a) * 340);
-        ctx.stroke();
-        for (let i = 1; i < 7; i++) {
-          const px = x + Math.cos(a) * i * 50;
-          const py = y + Math.sin(a) * i * 50;
-          leaf(px, py, a - 0.7, 70);
-          leaf(px, py, a + 0.7, 70);
-        }
-      });
-      break;
-    case "lines":
-      ctx.strokeRect(50, 50, W - 100, H - 100);
-      ctx.lineWidth = 1;
-      ctx.strokeRect(66, 66, W - 132, H - 132);
-      break;
-    case "wash":
-      ctx.globalAlpha = 0.28;
-      [[0, 0, 340], [W, H, 380], [W, 0, 170], [0, H, 170]].forEach(([x, y, r]) => {
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.globalAlpha = 1;
-      break;
-    case "arch":
-      ctx.beginPath();
-      ctx.moveTo(110, H - 60);
-      ctx.lineTo(110, 480);
-      ctx.bezierCurveTo(110, 40, W - 110, 40, W - 110, 480);
-      ctx.lineTo(W - 110, H - 60);
-      ctx.stroke();
-      break;
-  }
-  ctx.restore();
-}
-
-function drawCard(canvas: HTMLCanvasElement, t: Template, text: CardText) {
+function drawCard(canvas: HTMLCanvasElement, art: HTMLImageElement, t: Template, text: CardText) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  const center = SIZE.width / 2;
-  const maxWidth = SIZE.width - 340;
-  ctx.fillStyle = t.bg;
-  ctx.fillRect(0, 0, SIZE.width, SIZE.height);
-  ornament(ctx, t);
+  const maxWidth = t.maxWidth ?? 760;
+  const x = t.left ? 100 : SIZE.width / 2;
+  const middle = SIZE.height / 2 + (t.dy ?? 0);
+  ctx.drawImage(art, 0, 0, SIZE.width, SIZE.height);
+  ctx.textAlign = t.left ? "left" : "center";
 
-  ctx.textAlign = "center";
-  ctx.fillStyle = t.ink;
-  ctx.font = `500 34px ${BODY_FONT}`;
-  ctx.fillText(text.heading, center, 190, maxWidth);
-  ctx.font = `italic 30px ${BODY_FONT}`;
-  ctx.fillText(text.quote, center, 262, maxWidth);
-  ctx.font = t.script ? `118px ${SCRIPT_FONT}` : `92px ${SERIF_FONT}`;
-  ctx.fillText(text.names, center, 440, maxWidth);
+  // Diminui a fonte em vez de espremer as letras quando o nome é longo.
+  const put = (value: string, y: number, weight: string, size: number, font: string, color: string) => {
+    let current = size;
+    ctx.font = `${weight} ${current}px ${font}`;
+    while (ctx.measureText(value).width > maxWidth && current > 18) {
+      current -= 2;
+      ctx.font = `${weight} ${current}px ${font}`;
+    }
+    ctx.fillStyle = color;
+    ctx.fillText(value, x, y);
+  };
+
+  put(text.heading, middle - 300, "500", 32, BODY_FONT, t.accent);
+  put(text.quote, middle - 228, "italic 400", 33, BODY_FONT, t.ink);
+  put(text.names, middle - 62, "400", t.nameSize, t.nameFont, t.ink);
   ctx.fillStyle = t.accent;
-  ctx.fillRect(center - 60, 505, 120, 3);
-  ctx.fillStyle = t.ink;
-  ctx.font = `500 42px ${BODY_FONT}`;
-  ctx.fillText(text.line1, center, 600, maxWidth);
-  ctx.font = `34px ${BODY_FONT}`;
-  ctx.fillText(text.line2, center, 672, maxWidth);
-  ctx.font = `28px ${BODY_FONT}`;
-  ctx.fillText(text.line3, center, 800, maxWidth);
+  ctx.fillRect(t.left ? x : x - 60, middle + 2, 120, 2);
+  put(text.line1, middle + 88, "500", 42, BODY_FONT, t.ink);
+  put(text.line2, middle + 150, "400", 33, BODY_FONT, t.ink);
+  put(text.line3, middle + 262, "400", 25, BODY_FONT, t.accent);
 }
 
 const HEADINGS: Record<Kind, string> = {
@@ -356,13 +274,16 @@ export function StationeryPanel({ data, kind, slug, siteUrl }: PanelProps & { ki
 
   useEffect(() => {
     let active = true;
-    // Espera as fontes: no canvas, fonte ainda não carregada cai na padrão do navegador.
+    const art = new Image();
+    art.src = artUrl(template);
+    // Espera a arte e as fontes: no canvas, fonte ainda não carregada cai na padrão do navegador.
     void Promise.all([
-      document.fonts.load(`118px ${SCRIPT_FONT}`),
-      document.fonts.load(`92px ${SERIF_FONT}`),
+      art.decode(),
+      document.fonts.load(`${template.nameSize}px ${template.nameFont}`),
       document.fonts.load(`500 40px ${BODY_FONT}`),
-    ]).finally(() => {
-      if (active && canvas.current) drawCard(canvas.current, template, text);
+      document.fonts.load(`italic 400 33px ${BODY_FONT}`),
+    ]).then(() => {
+      if (active && canvas.current) drawCard(canvas.current, art, template, text);
     });
     return () => {
       active = false;
@@ -372,8 +293,8 @@ export function StationeryPanel({ data, kind, slug, siteUrl }: PanelProps & { ki
   const download = () => {
     if (!canvas.current) return;
     const link = document.createElement("a");
-    link.href = canvas.current.toDataURL("image/png");
-    link.download = `${kind}-${slug}.png`;
+    link.href = canvas.current.toDataURL("image/jpeg", 0.92);
+    link.download = `${kind}-${slug}.jpg`;
     link.click();
   };
 
@@ -389,18 +310,21 @@ export function StationeryPanel({ data, kind, slug, siteUrl }: PanelProps & { ki
     <div className="lc-paper">
       <div>
         <canvas ref={canvas} width={SIZE.width} height={SIZE.height} aria-label={`Prévia: ${text.heading} de ${coupleNames(data)}`} />
+      </div>
+      <div>
+        <h2 className="lc-panel-h3">Modelo</h2>
         <div className="lc-template-grid" role="radiogroup" aria-label="Modelo">
           {TEMPLATES.map((item) => (
-            <button key={item.name} type="button" role="radio" aria-checked={template.name === item.name} className={template.name === item.name ? "is-on" : ""} onClick={() => setTemplate(item)}>
-              <i style={{ background: item.bg, borderColor: item.accent, color: item.ink }}>Aa</i>
+            <button key={item.id} type="button" role="radio" aria-checked={template.id === item.id} className={template.id === item.id ? "is-on" : ""} onClick={() => setTemplate(item)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={artUrl(item)} alt="" loading="lazy" />
               <span>{item.name}</span>
             </button>
           ))}
         </div>
-      </div>
-      <div>
+        <h2 className="lc-panel-h3">Textos</h2>
         <Field label="Título" maxLength={40} value={text.heading} onChange={set("heading")} />
-        <TextArea label={kind === "notice" ? "Comunicado" : "Frase"} rows={2} maxLength={90} value={text.quote} onChange={set("quote")} />
+        <TextArea label={kind === "notice" ? "Comunicado" : "Frase"} rows={2} maxLength={70} value={text.quote} onChange={set("quote")} />
         <Field label="Nomes" maxLength={60} value={text.names} onChange={set("names")} />
         <Field label="Linha 1" maxLength={70} value={text.line1} onChange={set("line1")} />
         <Field label="Linha 2" maxLength={70} value={text.line2} onChange={set("line2")} />

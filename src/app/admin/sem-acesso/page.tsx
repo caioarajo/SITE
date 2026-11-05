@@ -16,7 +16,7 @@ export default function SemAcessoPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <img src="/logo-icon-navy.png" alt="LP" className="logo" />
+        <img src="/logo-icon-navy.svg" alt="LP" className="logo" />
         <h1>Sem acesso ao painel</h1>
         <p className="sub">
           Sua conta ainda não tem uma área própria neste sistema. Fale com um administrador se

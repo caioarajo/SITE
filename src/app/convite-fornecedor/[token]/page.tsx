@@ -25,7 +25,7 @@ export default async function ConviteFornecedorPage({ params }: { params: Promis
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "var(--cream)" }}>
       <div className="admin-card" style={{ maxWidth: 460, width: "100%" }}>
-        <img src="/logo-icon-navy.png" alt="LP" style={{ height: 36, marginBottom: 20 }} />
+        <img src="/logo-icon-navy.svg" alt="LP" style={{ height: 36, marginBottom: 20 }} />
         {!item ? (
           <>
             <h1 style={{ fontSize: 20, marginBottom: 10 }}>Convite não encontrado</h1>

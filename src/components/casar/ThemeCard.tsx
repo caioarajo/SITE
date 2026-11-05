@@ -1,10 +1,10 @@
 "use client";
 
 import type { Theme } from "@/lib/casar/themes";
-import { defaultSiteData, toPublicData } from "@/lib/casar/types";
-import { Countdown, SiteHero, themeStyle } from "./SiteView";
+import { defaultSiteData, toPublicData, type PublicSiteData } from "@/lib/casar/types";
+import { Countdown, Divider, SiteHero, themeStyle } from "./SiteView";
 
-const SAMPLE_PHOTOS = ["/images/hero-couple.jpg", "/images/portfolio-01.jpg", "/images/portfolio-02.jpg"];
+const SAMPLE_PHOTOS = ["/images/hero-couple.jpg", "/images/casar/art-3.jpg", "/images/casar/art-4.jpg"];
 
 function sampleData(theme: Theme, palette: number, name1: string, name2: string, photos: string[]) {
   const data = defaultSiteData();
@@ -15,6 +15,21 @@ function sampleData(theme: Theme, palette: number, name1: string, name2: string,
   data.intro.heroImage = photos[0];
   data.intro.gallery = photos.slice(1);
   return toPublicData(data);
+}
+
+/** O começo do site, para a miniatura mostrar também o estilo das seções. */
+function MiniSite({ theme, data, narrow }: { theme: Theme; data: PublicSiteData; narrow?: boolean }) {
+  return (
+    <div className={`ls-root is-${theme.layout} t-${theme.id} is-mini${narrow ? " is-narrow" : ""}`} style={themeStyle(data)}>
+      <SiteHero data={data} layout={theme.layout} />
+      <Countdown date="" sample />
+      <section className="ls-section ls-center">
+        <Divider />
+        <h2>Boas-vindas ao nosso site</h2>
+        <p>{data.intro.welcome}</p>
+      </section>
+    </div>
+  );
 }
 
 type Props = {
@@ -33,23 +48,12 @@ export default function ThemeCard({ theme, palette = 0, name1 = "Marina", name2 
     <article className="lc-theme">
       <h3>{theme.name}</h3>
       <div className="lc-theme-stage">
-        {theme.isNew && <span className="lc-theme-new">Novo</span>}
         <div className="lc-browser" aria-hidden="true">
           <div className="lc-browser-bar"><i /><i /><i /><b /></div>
-          <div className="lc-mini lc-mini-desktop">
-            <div className={`ls-root is-${theme.layout} is-mini`} style={themeStyle(data)}>
-              <SiteHero data={data} layout={theme.layout} />
-              <Countdown date="" sample />
-            </div>
-          </div>
+          <div className="lc-mini lc-mini-desktop"><MiniSite theme={theme} data={data} /></div>
         </div>
         <div className="lc-phone" aria-hidden="true">
-          <div className="lc-mini lc-mini-phone">
-            <div className={`ls-root is-${theme.layout} is-mini is-narrow`} style={themeStyle(data)}>
-              <SiteHero data={data} layout={theme.layout} />
-              <Countdown date="" sample />
-            </div>
-          </div>
+          <div className="lc-mini lc-mini-phone"><MiniSite theme={theme} data={data} narrow /></div>
         </div>
       </div>
       <p className="lc-theme-colors">

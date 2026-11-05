@@ -218,7 +218,7 @@ export default function AdminSidebar({ userEmail, role }: { userEmail: string; r
   return (
     <aside className="admin-sidebar">
       <div className="brand">
-        <img src="/logo-icon-cream.png" alt="LP" />
+        <img src="/logo-icon-cream.svg" alt="LP" />
         <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", color: "var(--cream)" }}>
           Painel
         </span>

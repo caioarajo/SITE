@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <img src="/logo-icon-navy.png" alt="LP" className="logo" />
+        <img src="/logo-icon-navy.svg" alt="LP" className="logo" />
         <h1>Área administrativa</h1>
         <p className="sub">Entre com sua conta para gerenciar o site</p>
 

@@ -25,6 +25,51 @@ const Sprig = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
+/** Divisor das seções: o desenho muda por tema, no CSS. */
+export const Divider = () => (
+  <span className="ls-divider" aria-hidden="true">
+    <Sprig />
+    <i />
+  </span>
+);
+
+/** Flor em traço, usada no tema Lírio. */
+const Lily = ({ className = "" }: { className?: string }) => (
+  <svg className={`ls-lily ${className}`} viewBox="0 0 200 420" fill="none" stroke="currentColor" strokeWidth="1.300" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M100 418C96 330 92 250 100 150" />
+    <path d="M100 150C70 130 42 96 46 44C72 58 92 88 100 150ZM100 150C130 130 158 96 154 44C128 58 108 88 100 150ZM100 150C84 110 82 54 100 8C118 54 116 110 100 150Z" />
+    <path d="M100 150C60 158 26 146 4 112C42 104 78 116 100 150ZM100 150C140 158 174 146 196 112C158 104 122 116 100 150Z" />
+    <path d="M100 150V96M92 150L84 100M108 150L116 100" />
+    <circle cx="100" cy="92" r="3" /><circle cx="83" cy="96" r="3" /><circle cx="117" cy="96" r="3" />
+    <path d="M97 300C70 290 44 262 38 226C68 234 90 262 97 300ZM99 350C126 340 152 312 158 276C128 284 106 312 99 350Z" />
+    <path d="M97 300L52 238M99 350L146 288" opacity=".6" />
+  </svg>
+);
+
+/** Flor cheia em camadas, usada em Noite de Pétalas. */
+const Bloom = ({ className = "" }: { className?: string }) => (
+  <svg className={`ls-bloom ${className}`} viewBox="0 0 240 240" aria-hidden="true">
+    {[0, 1, 2].map((ring) => (
+      <g key={ring} opacity={0.5 + ring * 0.25}>
+        {Array.from({ length: 9 - ring * 2 }, (_, i) => (
+          <path
+            key={i}
+            transform={`translate(120 120) rotate(${(i * 360) / (9 - ring * 2) + ring * 17}) scale(${1 - ring * 0.27})`}
+            d="M0 0C-48 -30 -58 -88 -12 -112C-4 -106 4 -106 12 -112C58 -88 48 -30 0 0Z"
+            fill="var(--s-primary)"
+            stroke="var(--s-bg)"
+            strokeWidth="1"
+            strokeOpacity=".55"
+          />
+        ))}
+      </g>
+    ))}
+    {Array.from({ length: 12 }, (_, i) => (
+      <circle key={i} cx={120 + Math.cos((i * Math.PI) / 6) * 9} cy={120 + Math.sin((i * Math.PI) / 6) * 9} r="1.800" fill="var(--s-bg)" opacity=".7" />
+    ))}
+  </svg>
+);
+
 /** Ramo em traço fino, usado nos temas botânicos. Desenho próprio, sem imagens externas. */
 const Branch = ({ className = "" }: { className?: string }) => (
   <svg className={`ls-branch ${className}`} viewBox="0 0 160 320" fill="none" stroke="currentColor" strokeWidth="1.100" strokeLinecap="round" aria-hidden="true">
@@ -89,7 +134,8 @@ export function SiteHero({ data, layout }: { data: PublicSiteData; layout: HeroL
     case "blob":
       return (
         <div className="ls-hero ls-hero-blob">
-          <Sprig className="is-a" /><Sprig className="is-b" />
+          <i className="ls-wash is-a" /><i className="ls-wash is-b" />
+          <Branch className="is-corner" />
           <div>{names("&")}{meta}</div>
           <Photo src={photo} mobile={mobile} className="is-blob" />
         </div>
@@ -98,6 +144,7 @@ export function SiteHero({ data, layout }: { data: PublicSiteData; layout: HeroL
     case "leaves":
       return (
         <div className={`ls-hero ls-hero-line${layout === "leaves" ? " is-leaves" : ""}`}>
+          <Lily className="is-left" /><Lily className="is-right" />
           <Branch className="is-left" /><Branch className="is-right" />
           <p className="ls-hero-tag">{data.intro.subtitle}</p>
           {names("&")}{meta}
@@ -121,12 +168,22 @@ export function SiteHero({ data, layout }: { data: PublicSiteData; layout: HeroL
             <div className="ls-monogram"><Branch /><span>{name1.charAt(0)}·{name2.charAt(0)}</span></div>
             {names("e")}{meta}
           </div>
+          <svg className="ls-torn" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 60V26L60 34L130 18L210 30L300 14L380 28L470 12L560 30L650 16L740 32L830 14L920 28L1010 12L1100 30L1200 18V60Z" />
+          </svg>
         </div>
       );
     case "oval":
       return (
         <div className="ls-hero ls-hero-oval">
-          <div className="ls-oval-frame"><Photo src={photo} mobile={mobile} className="is-oval" /><Sprig className="is-a" /></div>
+          <div className="ls-oval-frame">
+            <svg className="ls-geo" viewBox="0 0 400 500" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M200 8L372 112L352 392L200 492L48 392L28 112Z" strokeWidth="1.600" />
+              <path d="M200 8L352 392M200 8L48 392M28 112L352 392M372 112L48 392M28 112H372M48 392H352" strokeWidth=".6" />
+            </svg>
+            <Photo src={photo} mobile={mobile} className="is-oval" />
+            <Branch className="is-a" /><Branch className="is-b" />
+          </div>
           {names("+")}{meta}
         </div>
       );
@@ -143,7 +200,8 @@ export function SiteHero({ data, layout }: { data: PublicSiteData; layout: HeroL
     case "night":
       return (
         <div className="ls-hero ls-hero-night">
-          <Branch className="is-left" /><Branch className="is-right" />
+          <Bloom className="is-a" /><Bloom className="is-b" /><Bloom className="is-c" /><Bloom className="is-d" />
+          <i className="ls-fan is-left" /><i className="ls-fan is-right" />
           <div className="ls-night-frame">{names("&")}</div>
           {meta}
         </div>
@@ -577,6 +635,19 @@ function IntroSlider({ photos, seconds, onDone }: { photos: string[]; seconds: n
   );
 }
 
+const NAV_LABELS: Record<SectionId, string> = {
+  about: "O casal",
+  gallery: "Fotos",
+  padrinhos: "Padrinhos",
+  ceremony: "Cerimônia",
+  party: "Festa",
+  dresscode: "Traje",
+  lodging: "Hospedagem",
+  gifts: "Presentes",
+  rsvp: "Confirmar presença",
+  mural: "Recados",
+};
+
 type Props = {
   slug: string;
   data: PublicSiteData;
@@ -662,10 +733,10 @@ export default function SiteView({ slug, data, messages, preview = false, narrow
   const order = data.sectionOrder.filter(visible);
 
   return (
-    <div className={`ls-root is-${theme.layout}${data.theme.decor ? "" : " no-decor"}${narrow ? " is-narrow" : ""}`} style={themeStyle(data)}>
+    <div className={`ls-root is-${theme.layout} t-${theme.id}${data.theme.decor ? "" : " no-decor"}${narrow ? " is-narrow" : ""}`} style={themeStyle(data)}>
       <nav className="ls-nav" aria-label="Seções do site">
         <a href="#inicio">Início</a>
-        {order.map((id) => <a key={id} href={`#${id}`}>{titleOf(id)}</a>)}
+        {order.map((id) => <a key={id} href={`#${id}`}>{data.sectionLabels[id]?.trim() || NAV_LABELS[id as SectionId] || titleOf(id)}</a>)}
       </nav>
 
       <div id="inicio"><SiteHero data={data} layout={theme.layout} /></div>
@@ -673,7 +744,7 @@ export default function SiteView({ slug, data, messages, preview = false, narrow
 
       {data.intro.welcome && (
         <section className="ls-section ls-center ls-welcome">
-          <Sprig />
+          <Divider />
           <h2>Boas-vindas ao nosso site</h2>
           <p>{data.intro.welcome}</p>
         </section>
@@ -684,7 +755,7 @@ export default function SiteView({ slug, data, messages, preview = false, narrow
         const video = custom ? youtubeId(custom.video) : "";
         return (
           <section key={id} id={id} className={`ls-section ls-center${i % 2 === 0 ? " ls-tint" : ""}`}>
-            <Sprig />
+            <Divider />
             <h2>{titleOf(id)}</h2>
             {custom ? (
               <>

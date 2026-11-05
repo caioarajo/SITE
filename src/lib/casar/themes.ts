@@ -8,7 +8,6 @@ export type Theme = {
   layout: HeroLayout;
   display: string;
   body: string;
-  isNew?: boolean;
   palettes: Palette[];
 };
 
@@ -29,7 +28,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "pessego", name: "Pêssego", layout: "blob", display: CAPS, body: SANS, isNew: true,
+    id: "pessego", name: "Pêssego", layout: "blob", display: CAPS, body: SANS,
     palettes: [
       { name: "Pêssego", primary: "#e08458", bg: "#fffaf6", text: "#5a4238", accent: "#fde6d8" },
       { name: "Rosa", primary: "#cc6f88", bg: "#fff9fa", text: "#57404a", accent: "#fae3e9" },
@@ -37,7 +36,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "lirio", name: "Lírio", layout: "line", display: CAPS, body: SANS, isNew: true,
+    id: "lirio", name: "Lírio", layout: "line", display: CAPS, body: SANS,
     palettes: [
       { name: "Dourado", primary: "#ab7f3f", bg: "#fdfcf9", text: "#4b4133", accent: "#f3ecdf" },
       { name: "Grafite", primary: "#55585f", bg: "#fbfbfb", text: "#33353a", accent: "#ebebed" },
@@ -45,7 +44,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "tracos", name: "Traços", layout: "script", display: SCRIPT, body: SANS, isNew: true,
+    id: "tracos", name: "Traços", layout: "script", display: SCRIPT, body: SANS,
     palettes: [
       { name: "Areia", primary: "#967f69", bg: "#f8f7f4", text: "#6d5d4f", accent: "#ece6df" },
       { name: "Terracota", primary: "#b9694b", bg: "#fbf7f4", text: "#5e3f32", accent: "#f2e1d9" },
@@ -53,7 +52,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "entardecer", name: "Entardecer", layout: "photo", display: CORMORANT, body: SANS, isNew: true,
+    id: "entardecer", name: "Entardecer", layout: "photo", display: CORMORANT, body: SANS,
     palettes: [
       { name: "Bronze", primary: "#a4644e", bg: "#ffffff", text: "#4f4038", accent: "#f4ebe5" },
       { name: "Noite", primary: "#27384f", bg: "#ffffff", text: "#27384f", accent: "#e6eaf0" },
@@ -61,7 +60,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "folhas", name: "Folhas Azuis", layout: "leaves", display: MONT, body: SANS, isNew: true,
+    id: "folhas", name: "Folhas Azuis", layout: "leaves", display: MONT, body: SANS,
     palettes: [
       { name: "Azul", primary: "#5f769c", bg: "#fbfcfe", text: "#465573", accent: "#e6ebf3" },
       { name: "Verde", primary: "#5c8067", bg: "#fbfdfb", text: "#425a4a", accent: "#e4ede6" },
@@ -69,7 +68,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "jardim", name: "Jardim", layout: "oval", display: SCRIPT, body: MONT, isNew: true,
+    id: "jardim", name: "Jardim", layout: "oval", display: SCRIPT, body: MONT,
     palettes: [
       { name: "Oliva", primary: "#7f7f42", bg: "#f5f5f1", text: "#565633", accent: "#e8e8d9" },
       { name: "Eucalipto", primary: "#5a8074", bg: "#f5f8f7", text: "#3f5a52", accent: "#dfeae6" },
@@ -77,7 +76,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "nos", name: "Nós Dois", layout: "mosaic", display: MONT, body: SANS, isNew: true,
+    id: "nos", name: "Nós Dois", layout: "mosaic", display: MONT, body: SANS,
     palettes: [
       { name: "Preto", primary: "#161616", bg: "#ffffff", text: "#333333", accent: "#eeeeee" },
       { name: "Marinho", primary: "#182c52", bg: "#ffffff", text: "#27324a", accent: "#e8ecf3" },
@@ -85,7 +84,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "serenata", name: "Serenata", layout: "blob", display: SCRIPT, body: SANS, isNew: true,
+    id: "serenata", name: "Serenata", layout: "blob", display: SCRIPT, body: SANS,
     palettes: [
       { name: "Rosé", primary: "#b5657b", bg: "#fffbfb", text: "#59404a", accent: "#f7e6ea" },
       { name: "Vinho", primary: "#7b2f45", bg: "#fffafa", text: "#3f2730", accent: "#f1e2e6" },
@@ -93,7 +92,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "sereno", name: "Sereno", layout: "line", display: CORMORANT, body: MONT, isNew: true,
+    id: "sereno", name: "Sereno", layout: "line", display: CORMORANT, body: MONT,
     palettes: [
       { name: "Névoa", primary: "#5f7f8c", bg: "#fbfdfd", text: "#3f525a", accent: "#e4edf0" },
       { name: "Lago", primary: "#34707a", bg: "#f9fdfd", text: "#2d4a50", accent: "#dcecee" },
@@ -101,7 +100,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "gala", name: "Traje de Gala", layout: "night", display: SERIF, body: MONT, isNew: true,
+    id: "gala", name: "Traje de Gala", layout: "night", display: SERIF, body: MONT,
     palettes: [
       { name: "Prata", primary: "#d6d6d6", bg: "#0e0e0f", text: "#f1f1f1", accent: "#1f1f21" },
       { name: "Champanhe", primary: "#dcc7a0", bg: "#100f0c", text: "#f4efe5", accent: "#221f19" },
@@ -109,7 +108,7 @@ const OWN_THEMES: Theme[] = [
     ],
   },
   {
-    id: "noite", name: "Noite de Pétalas", layout: "night", display: CAPS, body: SANS, isNew: true,
+    id: "noite", name: "Noite de Pétalas", layout: "night", display: CAPS, body: SANS,
     palettes: [
       { name: "Rubi", primary: "#d9a6a0", bg: "#0b0b0d", text: "#f2ecea", accent: "#1d1b1f" },
       { name: "Ouro", primary: "#c9a86a", bg: "#0d0c0a", text: "#f3eee3", accent: "#201d17" },

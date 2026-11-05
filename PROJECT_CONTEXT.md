@@ -102,6 +102,9 @@ convidados abrem `/lp-casar/[slug]`. Schema em `supabase/migrations/0019_lp_casa
 - **Presentes:** Pix direto na chave dos noivos (`lib/casar/pix.ts` gera o BR Code). O LP Casar não recebe nem repassa dinheiro, então
   não confirma pagamento: o aviso do convidado fica "a conferir" até os noivos marcarem como recebido. A "Carteira" é um controle, não um saldo.
 - **Chave Pix:** nunca vai para o navegador do convidado como dado do site (`toPublicData`); só aparece dentro do QR, no momento do presente.
+- **Logos:** `public/logo-*.svg` são vetores: o símbolo foi vetorizado do PNG original e o nome da assessoria recriado em Inter Light, parecido com o original.
+- **Papelaria:** fundos em `public/images/casar/papelaria`, com fontes SVG editáveis em `design/papelaria`. O texto entra por cima, no canvas (`panels/other.tsx`).
+- **Temas:** a identidade de cada um fica nas classes `.t-<id>` de `lp-casar.css`.
 - **Fontes:** `@import` com vírgula na URL é descartado pelo compilador sem aviso; usar `%2C`. Ver `lp-casar.css`.
 - **Redefinir senha (Supabase):** o e-mail aponta para `/api/casar/auth/callback`, que precisa estar nas Redirect URLs do projeto Supabase.
 - **E-mails:** só saem com `RESEND_API_KEY` e `LP_CASAR_EMAIL_FROM` configurados. Sem isso, os avisos ficam só no painel (números nos menus).

@@ -47,8 +47,7 @@ export function Logo({ light = false }: { light?: boolean }) {
   return (
     <a className={`lc-logo${light ? " is-light" : ""}`} href="/lp-casar" aria-label="LP Casar">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={light ? "/logo-icon-cream.png" : "/logo-icon-navy.png"} alt="" />
-      <span><em>Casar</em></span>
+      <img src={light ? "/logo-lp-casar-cream.svg" : "/logo-lp-casar-navy.svg"} alt="" />
     </a>
   );
 }

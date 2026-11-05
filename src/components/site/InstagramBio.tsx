@@ -43,7 +43,7 @@ export default function InstagramBio({
       </span>
 
       <motion.div className="bio-card" variants={container} initial="hidden" animate="show">
-        <motion.img variants={item} className="bio-logo" src="/logo-full-cream.png" alt="LP Assessoria e Cerimonial" />
+        <motion.img variants={item} className="bio-logo" src="/logo-full-cream.svg" alt="LP Assessoria e Cerimonial" />
         <motion.p variants={item} className="bio-tagline">
           Cerimonialista e assessora de eventos em Manaus
         </motion.p>
